@@ -62,11 +62,6 @@ Created and open-sourced at GoDaddy, Gasket lets us create standard templates fo
 
 To use Gasket, we would normally to install it into our project via NPM (Node Package Manager) via [these instructions](https://github.com/godaddy/gasket/blob/master/docs/quick-start.md). However, this repo already comes with gasket installed so no need to worry!
 
-And speaking of libraries, let's install one called [Material UI](https://v5.mui.com/material-ui/). This is a Google-inspired opensource library that contains some basic react components we'll use to make our web app pretty. We'll go more in-depth into Material UI a little later on. For now though, let's just run this command:
-```
-npm install @mui/material
-```
-
 ### Framework skeleton
 Alright, enough talk, let's look at some code. After creating a new Gasket app with the Next.js preset, we get a few key things:
 - Some config files that we'll ignore for now (`gasket.config.js`, `package.json`, `jest.config.js`)
