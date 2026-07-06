@@ -15,6 +15,10 @@ export const ShopPage = () => (
       <Link href="/cart">View cart</Link>
     </div>
 
+    <div> 
+      <Link href="/wishlist">View wishlist</Link>
+    </div>
+
     <ShopItemList />
   </Container>
 );

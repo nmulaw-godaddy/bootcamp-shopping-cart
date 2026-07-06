@@ -6,6 +6,7 @@ import ShopItem from './ShopItem'
 function ShopItemList() {
   const getProductsUrl = 'http://localhost:8000/v1/products';
   const addToCartUrl = 'http://localhost:8000/v1/cartitems';
+  const addToWishlistUrl = 'http://localhost:8000/v1/wishlistitems';
 
   const [products, setProducts] = useState([]);
   const router = useRouter();
@@ -55,6 +56,28 @@ function ShopItemList() {
   }
 };
 
+const handleAddToWishlist = async (product) => {
+  try {
+    const body = JSON.stringify(product);
+
+    const response = await fetch(addToWishlistUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add item to wishlist');
+    }
+
+    router.push('/wishlist');
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+  }
+};
+
   return (
     <Grid container direction="row" spacing={1}>
       {products.map((product) => (
@@ -68,6 +91,7 @@ function ShopItemList() {
             is_on_sale={product.is_on_sale}
             sale_price={product.sale_price}
             onAddToCart={handleAddToCart}
+            onAddToWishlist={handleAddToWishlist}
           />
         </Grid>
       ))}

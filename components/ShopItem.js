@@ -11,7 +11,7 @@ const images = [
 
 ]
 
-function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, }) {
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, onAddToWishlist }) {
   
   const imageIndex = id ? (Number(id) - 1) % images.length : 0;
   const displayImage = image_url || images[imageIndex];
@@ -31,6 +31,20 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
     onAddToCart(newItem);
   };
 
+  const addToWishlist = () => {
+    const newItem = {
+      product_id: id,
+      name,
+      description,
+      image_url: displayImage,
+      price,
+      is_on_sale,
+      sale_price,
+    };
+
+    onAddToWishlist(newItem);
+  };
+
   return (
     <Card style={{ height: '400px' }}>
       {displayImage && (
@@ -41,6 +55,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
           alt={name}
         />
       )}
+
 
       <CardContent>
         <Typography variant="h5" component="div">
@@ -57,6 +72,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       </CardContent>
       <CardActions>
         <Button variant="contained" color="primary" onClick={addToCart}>Add to Cart</Button>
+        <Button variant="contained" color="secondary" onClick={addToWishlist}>Add to Wishlist</Button>
       </CardActions>
     </Card>
   );
