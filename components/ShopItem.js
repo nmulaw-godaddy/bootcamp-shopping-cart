@@ -11,10 +11,14 @@ const images = [
 
 ]
 
-function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, }) {
-  
+export function getImageUrl(id, image_url) {
   const imageIndex = id ? (Number(id) - 1) % images.length : 0;
-  const displayImage = image_url || images[imageIndex];
+  return image_url || images[imageIndex];
+}
+
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, }) {
+
+  const displayImage = getImageUrl(id, image_url);
 
   const addToCart = () => {
     const newItem = {
