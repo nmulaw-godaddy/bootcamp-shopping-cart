@@ -16,9 +16,14 @@ export function getImageUrl(id, image_url) {
   return image_url || images[imageIndex];
 }
 
-function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, }) {
+export function isOutOfStock(quantity) {
+  return Number(quantity) === 0;
+}
+
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, quantity, onAddToCart }) {
 
   const displayImage = getImageUrl(id, image_url);
+  const outOfStock = isOutOfStock(quantity);
 
   const addToCart = () => {
     const newItem = {
@@ -36,7 +41,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
   };
 
   return (
-    <Card style={{ height: '400px' }}>
+    <Card style={{ height: '400px' }} sx={{ opacity: outOfStock ? 0.5 : 1 }}>
       {displayImage && (
         <CardMedia
           component="img"
@@ -56,11 +61,19 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
         </Typography>
 
         <Typography variant="body1" color="text.primary">
-          {is_on_sale ? sale_price: price }
+          ${is_on_sale ? sale_price : price}
         </Typography>
+
+        {outOfStock && (
+          <Typography variant="body2" color="error">
+            Out of Stock
+          </Typography>
+        )}
       </CardContent>
       <CardActions>
-        <Button variant="contained" color="primary" onClick={addToCart}>Add to Cart</Button>
+        <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock}>
+          Add to Cart
+        </Button>
       </CardActions>
     </Card>
   );
