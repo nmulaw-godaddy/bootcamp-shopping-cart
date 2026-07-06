@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Typography } from '@mui/material';
 import CartItem from './CartItem';
 
-function CartItemList() {
+function CartItemList({ sharedCart, onCartItemsChange }) {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
+    if (sharedCart) {
+      setCartItems(sharedCart);
+      return;
+    }
+
     const getCartItems = async () => {
       try {
         const response = await fetch('http://localhost:8000/v1/cartitems');
@@ -14,13 +19,16 @@ function CartItemList() {
         console.log('Cart items from API:', json);
 
         setCartItems(json);
+        if (onCartItemsChange) {
+          onCartItemsChange(json);
+        }
       } catch (error) {
         console.error('Error fetching cart items:', error);
       }
     };
 
     getCartItems();
-  }, []);
+  }, [sharedCart]);
 
   const deleteCartItem = async (id) => {
     try {
