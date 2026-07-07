@@ -22,6 +22,26 @@ function CartItemList() {
     getCartItems();
   }, []);
 
+  const updateCartItemQuantity = async (id, newQuantity) => {
+    try {
+      const response = await fetch(`http://localhost:8000/v1/cartitems/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: newQuantity }),
+      });
+      if (response.ok) {
+        setCartItems(cartItems.map((item) =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        ));
+      } else {
+        const json = await response.json();
+        alert(json.message || 'Failed to update quantity.');
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+  };
+
   const deleteCartItem = async (id) => {
     try {
       console.log('Deleting cart item id:', id);
@@ -66,6 +86,7 @@ function CartItemList() {
               is_on_sale={item.is_on_sale}
               sale_price={item.sale_price}
               quantity={item.quantity || 1}
+              onQuantityChange={(newQty) => updateCartItemQuantity(item.id, newQty)}
               onDeleteItem={() => deleteCartItem(item.id)}
             />
           </Grid>

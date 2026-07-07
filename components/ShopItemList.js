@@ -67,7 +67,7 @@ function ShopItemList() {
             price={product.price}
             is_on_sale={product.is_on_sale}
             sale_price={product.sale_price}
-            quantity={product.quantity}
+            stockQuantity={product.quantity}
             onAddToCart={handleAddToCart}
           />
         </Grid>

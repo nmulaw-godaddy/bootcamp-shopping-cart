@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardActions, Typography, Button, CardMedia } from '@mui/material';
 
 const images = [
@@ -20,10 +20,11 @@ export function isOutOfStock(quantity) {
   return Number(quantity) === 0;
 }
 
-function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, quantity, onAddToCart }) {
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart }) {
 
   const displayImage = getImageUrl(id, image_url);
-  const outOfStock = isOutOfStock(quantity);
+  const outOfStock = isOutOfStock(stockQuantity);
+  const [selectedQty, setSelectedQty] = useState(1);
 
   const addToCart = () => {
     const newItem = {
@@ -34,14 +35,14 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       price,
       is_on_sale,
       sale_price,
-      quantity: 1,
+      quantity: selectedQty,
     };
 
     onAddToCart(newItem);
   };
 
   return (
-    <Card style={{ height: '400px' }} sx={{ opacity: outOfStock ? 0.5 : 1 }}>
+    <Card style={{ minHeight: '400px' }} sx={{ opacity: outOfStock ? 0.5 : 1 }}>
       {displayImage && (
         <CardMedia
           component="img"
@@ -69,6 +70,22 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
             Out of Stock
           </Typography>
         )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setSelectedQty(selectedQty - 1)}
+            disabled={outOfStock || selectedQty <= 1}
+          >−</Button>
+          <Typography variant="body1">{selectedQty}</Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setSelectedQty(selectedQty + 1)}
+            disabled={outOfStock || selectedQty >= stockQuantity}
+          >+</Button>
+        </div>
       </CardContent>
       <CardActions>
         <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock}>

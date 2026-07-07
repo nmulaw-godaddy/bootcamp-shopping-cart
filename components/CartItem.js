@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardActions, Typography, Button, CardMedia } from '@mui/material'
 import { getImageUrl } from './ShopItem';
 
-function CartItem({ product_id, name, description, image_url, price, is_on_sale, sale_price, quantity, onDeleteItem }) {
+function CartItem({ product_id, name, description, image_url, price, is_on_sale, sale_price, quantity, onQuantityChange, onDeleteItem }) {
 
   const displayImage = getImageUrl(product_id, image_url);
 
@@ -11,7 +11,7 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
   const subtotal = itemPrice * itemQuantity;
 
   return (
-    <Card style={{ height: '400px' }}>
+    <Card style={{ minHeight: '400px' }}>
       {displayImage && (
         <CardMedia
           component="img"
@@ -34,9 +34,20 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
           Price: ${itemPrice.toFixed(2)}
         </Typography>
 
-        <Typography variant="body1">
-          Quantity: {itemQuantity}
-        </Typography>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => onQuantityChange(itemQuantity - 1)}
+            disabled={itemQuantity <= 1}
+          >−</Button>
+          <Typography variant="body1">{itemQuantity}</Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => onQuantityChange(itemQuantity + 1)}
+          >+</Button>
+        </div>
 
         <Typography variant="body1">
           Subtotal: ${subtotal.toFixed(2)}
