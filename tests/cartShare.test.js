@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createCartShareUrl, decodeSharedCart } = require('../utils/cartShare');
+const { createCartShareUrl, decodeSharedCart } = require('../components/CartShare');
 
 test('creates a shareable cart URL from cart items', () => {
   const cartItems = [{ id: 1, name: 'Hat', quantity: 2 }];

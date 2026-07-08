@@ -29,39 +29,49 @@ function ShopItemList() {
   }, []);
 
   const handleAddToCart = async (product) => {
-  try {
-    console.log('Product being added:', product);
+    try {
+      const cartResponse = await fetch(addToCartUrl);
+      const cartItems = cartResponse.ok ? await cartResponse.json() : [];
+      const existing = Array.isArray(cartItems)
+        ? cartItems.find((item) => item.product_id === product.product_id)
+        : null;
 
-    const body = JSON.stringify(product);
+      if (existing) {
+        const newQty = Number(existing.quantity || 1) + Number(product.quantity || 1);
+        const patchResponse = await fetch(`${addToCartUrl}/${existing.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quantity: newQty }),
+        });
+        if (!patchResponse.ok) {
+          console.error('Failed to update cart item quantity');
+          return;
+        }
+      } else {
+        const postResponse = await fetch(addToCartUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(product),
+        });
+        if (!postResponse.ok) {
+          console.error('Failed to add item to cart');
+          return;
+        }
+      }
 
-    const response = await fetch(addToCartUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-
-    console.log('Add to cart response status:', response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Add to cart failed:', errorText);
-      return;
+      router.push('/cart');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
-
-    router.push('/cart');
-  } catch (error) {
-    console.error('Error adding to cart:', error);
-  }
 };
 
+  const safeProducts = Array.isArray(products) ? products : [];
   const filtered = searchTerm
-    ? products.filter((p) =>
+    ? safeProducts.filter((p) =>
         p.name.toLowerCase().includes(searchTerm) ||
         (p.description || '').toLowerCase().includes(searchTerm)
       )
-    : products;
+    : safeProducts;
 
   return (
     <Grid container direction="row" spacing={1}>
