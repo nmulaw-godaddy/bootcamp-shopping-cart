@@ -7,16 +7,23 @@ function WishlistItemList() {
 
   useEffect(() => {
     const getWishlistItems = async () => {
-        try {
-            const response = await fetch('http://localhost:8000/v1/wishlistitems');
-            const json = await response.json();
+      try {
+        const response = await fetch('http://localhost:8000/v1/wishlistitems');
 
-            console.log('Wishlist items from API:', json);
-
-            setWishlistItems(json);
-        } catch (error) {
-            console.error('Error fetching wishlist items:', error);
+        if (!response.ok) {
+          console.error('Wishlist API failed:', response.status);
+          setWishlistItems([]);
+          return;
         }
+
+        const json = await response.json();
+
+        console.log('Wishlist items from API:', json);
+
+        setWishlistItems(json);
+      } catch (error) {
+        console.error('Error fetching wishlist items:', error);
+      }
     };
 
     getWishlistItems();
@@ -66,5 +73,3 @@ function WishlistItemList() {
 }
 
 export default WishlistItemList;
-      
-

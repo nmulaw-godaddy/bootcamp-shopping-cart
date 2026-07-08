@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@mui/material'
-import { useRouter } from 'next/router'
-import ShopItem from './ShopItem'
+import { Grid } from '@mui/material';
+import { useRouter } from 'next/router';
+import ShopItem from './ShopItem';
 
 function ShopItemList() {
   const getProductsUrl = 'http://localhost:8000/v1/products';
@@ -29,54 +29,60 @@ function ShopItemList() {
   }, []);
 
   const handleAddToCart = async (product) => {
-  try {
-    console.log('Product being added:', product);
+    try {
+      console.log('Product being added to cart:', product);
 
-    const body = JSON.stringify(product);
+      const body = JSON.stringify(product);
 
-    const response = await fetch(addToCartUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
+      const response = await fetch(addToCartUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
 
-    console.log('Add to cart response status:', response.status);
+      console.log('Add to cart response status:', response.status);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Add to cart failed:', errorText);
-      return;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Add to cart failed:', errorText);
+        return;
+      }
+
+      router.push('/cart');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
+  };
 
-    router.push('/cart');
-  } catch (error) {
-    console.error('Error adding to cart:', error);
-  }
-};
+  const handleAddToWishlist = async (product) => {
+    try {
+      console.log('Product being added to wishlist:', product);
 
-const handleAddToWishlist = async (product) => {
-  try {
-    const body = JSON.stringify(product);
+      const body = JSON.stringify(product);
 
-    const response = await fetch(addToWishlistUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
+      const response = await fetch(addToWishlistUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to add item to wishlist');
+      console.log('Add to wishlist response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Add to wishlist failed:', errorText);
+        return;
+      }
+
+      router.push('/wishlist');
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
     }
-
-    router.push('/wishlist');
-  } catch (error) {
-    console.error('Error adding to wishlist:', error);
-  }
-};
+  };
 
   return (
     <Grid container direction="row" spacing={1}>

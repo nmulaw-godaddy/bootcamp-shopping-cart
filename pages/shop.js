@@ -1,7 +1,6 @@
 import React from 'react';
 import Head from '../components/head';
 import Link from 'next/link';
-
 import ShopItemList from '../components/ShopItemList';
 import { Container, Typography } from '@mui/material';
 
@@ -15,7 +14,7 @@ export const ShopPage = () => (
       <Link href="/cart">View cart</Link>
     </div>
 
-    <div> 
+    <div>
       <Link href="/wishlist">View wishlist</Link>
     </div>
 

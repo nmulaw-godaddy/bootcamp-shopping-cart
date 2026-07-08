@@ -1,15 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
-import { Contianer, Typography } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import WishlistItemList from '../components/WishlistItemList';
 
 function WishlistPage() {
   return (
-    <Contianer>
+    <Container>
       <Typography variant="h3">My Wishlist</Typography>
 
       <div>
-        <Link href="/shop">Back to shop </Link>
+        <Link href="/shop">Back to shop</Link>
       </div>
 
       <div>
@@ -17,7 +17,7 @@ function WishlistPage() {
       </div>
 
       <WishlistItemList />
-    </Contianer>
+    </Container>
   );
 }
 

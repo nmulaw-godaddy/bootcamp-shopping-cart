@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardActions, Typography, Button, CardMedia, } from '@mui/material';
+import {Card, CardContent, CardActions, Typography, Button, CardMedia} from '@mui/material';
 
 const images = [
   "https://img1.wsimg.com/cdn/Image/All/AllChannelsFoS/1/en-US/c8d98599-46cc-412d-bbb5-d766bb0e5a05/Product-grid-SSL.jpg",
@@ -11,24 +11,23 @@ const images = [
 ];
 
 function WishlistItem({ product_id, name, description, image_url, price, is_on_sale, sale_price, onDeleteItem }) {
+  const imageIndex = product_id ? (Number(product_id) - 1) % images.length : 0;
+  const displayImage = image_url || images[imageIndex];
 
-    const imageIndex = product_id ? (Number(product_id) - 1) % images.length : 0;
-    const displayImage = image_url || images[imageIndex];
+  const itemPrice = Number(is_on_sale ? sale_price : price);
 
-    const itemPrice = Number(is_on_sale ? sale_price : price);
+  return (
+    <Card style={{ height: '400px' }}>
+      {displayImage && (
+        <CardMedia
+          component="img"
+          height="200"
+          image={displayImage}
+          alt={name}
+        />
+      )}
 
-    return (
-        <Card style={{ height: '400px'}}>
-            {displayImage && (
-                <CardMedia
-                    component="img"
-                    height="200"
-                    image={displayImage}
-                    alt={name}
-                />
-            )}
-            
-    <CardContent>
+      <CardContent>
         <Typography variant="h5" component="div">
           {name}
         </Typography>
