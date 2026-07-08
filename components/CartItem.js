@@ -9,7 +9,7 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
 
   const displayImage = getImageUrl(product_id, image_url);
 
-  const itemPrice = Number(is_on_sale ? sale_price : price);
+  const itemPrice = Number(price);
   const itemQuantity = Number(quantity || 1);
   const subtotal = itemPrice * itemQuantity;
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import Head from '../components/head';
+import Link from 'next/link';
 import ShopItemList from '../components/ShopItemList';
 import ShoppingChatbot from '../components/ShoppingChatbot';
 import { Container } from '@mui/material';
