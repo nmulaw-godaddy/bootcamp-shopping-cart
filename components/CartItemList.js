@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, Button } from '@mui/material';
+import Link from 'next/link';
 import CartItem from './CartItem';
 
 function CartItemList() {
@@ -77,6 +78,26 @@ function CartItemList() {
           Total Price: ${totalPrice.toFixed(2)}
         </Typography>
       </div>
+      <Link href="/checkout" passHref>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          disabled={cartItems.length === 0}
+          style={{ marginTop: '20px', marginRight: '12px' }}
+        >
+          Proceed to Checkout
+        </Button>
+      </Link>
+      <Link href="/shop" passHref>
+        <Button
+          variant="outlined"
+          size="large"
+          style={{ marginTop: '20px' }}
+        >
+          Continue Shopping
+        </Button>
+      </Link>
     </div>
   );
 }
