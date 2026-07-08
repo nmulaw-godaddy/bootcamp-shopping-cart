@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Icon} from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
@@ -11,8 +11,7 @@ const images = [
   "https://img1.wsimg.com/cdn/Image/All/FOS-Intl/1/en-US/3b91b99f-57eb-44bd-b2e1-1cfd6529bbfb/feat-ols-your-store-your-way.jpg?impolicy=cms-feature-module"
 ];
 
-function ShopItem({id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, onAddToWishlist}) {
-
+export function getImageUrl(id, image_url) {
   const imageIndex = id ? (Number(id) - 1) % images.length : 0;
   return image_url || images[imageIndex];
 }
@@ -21,7 +20,7 @@ export function isOutOfStock(quantity) {
   return Number(quantity) === 0;
 }
 
-function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart }) {
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart, onAddToWishlist }) {
 
   const displayImage = getImageUrl(id, image_url);
   const outOfStock = isOutOfStock(stockQuantity);
