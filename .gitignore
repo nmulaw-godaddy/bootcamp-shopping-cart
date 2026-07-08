@@ -15,7 +15,7 @@ build
 # misc
 .env
 .idea
-*.iml
+*.iml run lo
 *.log
 *.bak
 .DS_Store

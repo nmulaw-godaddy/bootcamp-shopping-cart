@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@mui/material'
-import { useRouter } from 'next/router'
-import ShopItem from './ShopItem'
+import { Grid } from '@mui/material';
+import { useRouter } from 'next/router';
+import ShopItem from './ShopItem';
 
 function ShopItemList() {
   const getProductsUrl = 'http://localhost:8000/v1/products';
@@ -9,6 +9,7 @@ function ShopItemList() {
 
   const [products, setProducts] = useState([]);
   const router = useRouter();
+  const searchTerm = (router.query.q || '').toLowerCase();
 
   useEffect(() => {
     const getProducts = async () => {
@@ -55,9 +56,16 @@ function ShopItemList() {
   }
 };
 
+  const filtered = searchTerm
+    ? products.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm) ||
+        (p.description || '').toLowerCase().includes(searchTerm)
+      )
+    : products;
+
   return (
     <Grid container direction="row" spacing={1}>
-      {products.map((product) => (
+      {filtered.map((product) => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
           <ShopItem
             id={product.id}
@@ -67,6 +75,7 @@ function ShopItemList() {
             price={product.price}
             is_on_sale={product.is_on_sale}
             sale_price={product.sale_price}
+            stockQuantity={product.quantity}
             onAddToCart={handleAddToCart}
           />
         </Grid>
