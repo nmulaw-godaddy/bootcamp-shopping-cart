@@ -14,22 +14,29 @@ import CloseIcon from '@mui/icons-material/Close';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
+const QUICK_PROMPTS = [
+  'What should I add?',
+  'What is on sale?',
+  'Best for security?',
+  'Best domain option?'
+];
+
 function ShoppingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: 'Hello! I can help you decide what to add to your cart, or anything else you need help with.'
+      text: 'Hello! I can help you decide what to add to your cart, compare products, or find the best option for your needs.'
     }
   ]);
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const sendMessage = async () => {
-    const messageText = input.trim();
+  const sendMessage = async (quickPromptText) => {
+    const messageText = (quickPromptText || input).trim();
 
-    if (!messageText) {
+    if (!messageText || loading) {
       return;
     }
 
@@ -130,7 +137,7 @@ function ShoppingChatbot() {
             bottom: 24,
             width: 360,
             maxWidth: '90vw',
-            height: 500,
+            height: 560,
             zIndex: 1300,
             display: 'flex',
             flexDirection: 'column',
@@ -205,11 +212,65 @@ function ShoppingChatbot() {
             ))}
 
             {loading && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginBottom: 2 }}>
                 <CircularProgress size={18} />
-                <Typography variant="body2">Thinking...</Typography>
+                <Typography variant="body2">
+                  Checking your cart and products...
+                </Typography>
               </Box>
             )}
+
+            <Box
+              sx={{
+                marginTop: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start'
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#bfc7d5',
+                  marginBottom: 1
+                }}
+              >
+                Suggested questions
+              </Typography>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  flexWrap: 'wrap'
+                }}
+              >
+                {QUICK_PROMPTS.map((prompt) => (
+                  <Button
+                    key={prompt}
+                    size="small"
+                    variant="outlined"
+                    disabled={loading}
+                    onClick={() => sendMessage(prompt)}
+                    sx={{
+                      color: '#ffffff',
+                      borderColor: '#7c8797',
+                      borderRadius: 5,
+                      textTransform: 'none',
+                      fontSize: '0.72rem',
+                      padding: '4px 10px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                      '&:hover': {
+                        borderColor: '#64a6ff',
+                        backgroundColor: 'rgba(100, 166, 255, 0.12)'
+                      }
+                    }}
+                  >
+                    {prompt}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
           </Box>
 
           <Box
@@ -217,7 +278,8 @@ function ShoppingChatbot() {
               padding: 1.5,
               display: 'flex',
               gap: 1,
-              backgroundColor: '#2f3136'
+              backgroundColor: '#2f3136',
+              borderTop: '1px solid #444'
             }}
           >
             <TextField
@@ -238,7 +300,7 @@ function ShoppingChatbot() {
 
             <Button
               variant="contained"
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={loading}
             >
               Send
