@@ -55,9 +55,11 @@ function ShopItemList() {
   }
 };
 
+  const safeProducts = Array.isArray(products) ? products : [];
+
   return (
     <Grid container direction="row" spacing={1}>
-      {products.map((product) => (
+      {safeProducts.map((product) => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
           <ShopItem
             id={product.id}

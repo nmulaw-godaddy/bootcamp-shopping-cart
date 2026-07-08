@@ -40,7 +40,19 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
         </Typography>
 
         <Typography variant="body1">
-          Price: ${itemPrice.toFixed(2)}
+          Price:{' '}
+          {is_on_sale ? (
+            <>
+              <span style={{ textDecoration: 'line-through', color: '#888', marginRight: 8 }}>
+                ${Number(price).toFixed(2)}
+              </span>
+              <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
+                ${Number(sale_price).toFixed(2)}
+              </span>
+            </>
+          ) : (
+            `$${itemPrice.toFixed(2)}`
+          )}
         </Typography>
 
         <Typography variant="body1">

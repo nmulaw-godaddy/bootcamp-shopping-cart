@@ -52,7 +52,18 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
         </Typography>
 
         <Typography variant="body1" color="text.primary">
-          {is_on_sale ? sale_price: price }
+          {is_on_sale ? (
+            <>
+              <span style={{ textDecoration: 'line-through', color: '#888', marginRight: 8 }}>
+                ${Number(price).toFixed(2)}
+              </span>
+              <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
+                ${Number(sale_price).toFixed(2)}
+              </span>
+            </>
+          ) : (
+            `$${Number(price).toFixed(2)}`
+          )}
         </Typography>
       </CardContent>
       <CardActions>

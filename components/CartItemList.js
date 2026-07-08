@@ -51,10 +51,12 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
     }
   };
 
-  const totalPrice = cartItems
+  const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
+
+  const totalPrice = safeCartItems
     .map((item) => {
-      const itemPrice = Number(item.is_on_sale ? item.sale_price : item.price);
-      const quantity = Number(item.quantity || 1);
+      const itemPrice = Number(item?.is_on_sale ? item?.sale_price : item?.price);
+      const quantity = Number(item?.quantity || 1);
 
       return quantity * itemPrice;
     })
@@ -63,7 +65,7 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
   return (
     <div>
       <Grid container direction="column" spacing={3}>
-        {cartItems.map((item) => (
+        {safeCartItems.map((item) => (
           <Grid item xs={6} key={item.id}>
             <CartItem
               product_id={item.product_id}
