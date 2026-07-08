@@ -20,10 +20,21 @@ function Cart() {
     const link = createCartShareUrl(cartItems, window.location.origin);
     setShareLink(link);
 
-    navigator.clipboard.writeText(link).then(() => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    } else {
+      const el = document.createElement('textarea');
+      el.value = link;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    }
   };
 
   return (
@@ -49,11 +60,10 @@ function Cart() {
       )}
 
       <CartItemList sharedCart={sharedCart} onCartItemsChange={setCurrentCartItems} />
-      
-        <Link href="/shop" passHref>                                  
-          <Button variant="contained">View shop</Button>              
+
+        <Link href="/shop" passHref>
+          <Button variant="contained">View shop</Button>
         </Link>
-      <CartItemList />
     </Container>
   );
 }
