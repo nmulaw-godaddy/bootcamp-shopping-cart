@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Icon} from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Chip, Box } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 const images = [
@@ -57,8 +57,26 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
     onAddToWishlist(newItem);
   };
 
+  const discountPercent = is_on_sale && price && sale_price
+    ? Math.round(((price - sale_price) / price) * 100)
+    : 0;
+
   return (
-    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {is_on_sale && (
+        <Chip
+          label={`${discountPercent}% OFF`}
+          color="error"
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            zIndex: 1,
+            fontWeight: 'bold'
+          }}
+        />
+      )}
       {displayImage && (
         <CardMedia
           component="img"
@@ -81,20 +99,25 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
           {description}
         </Typography>
 
-        <Typography variant="body1" color="text.primary">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {is_on_sale ? (
             <>
-              <span style={{ textDecoration: 'line-through', color: '#888', marginRight: 8 }}>
-                ${Number(price).toFixed(2)}
-              </span>
-              <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
-                ${Number(sale_price).toFixed(2)}
-              </span>
+              <Typography
+                variant="body2"
+                sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+              >
+                ${price}
+              </Typography>
+              <Typography variant="h6" color="error" sx={{ fontWeight: 'bold' }}>
+                ${sale_price}
+              </Typography>
             </>
           ) : (
-            `$${Number(price).toFixed(2)}`
+            <Typography variant="h6" color="text.primary">
+              ${price}
+            </Typography>
           )}
-        </Typography>
+        </Box>
 
         {outOfStock && (
           <Typography variant="body2" color="error">

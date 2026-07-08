@@ -22,7 +22,8 @@ function ShopItemList() {
         });
 
         const json = await response.json();
-        setProducts(json);
+        console.log('API response:', json);
+        setProducts(Array.isArray(json) ? json : []);
       } catch (error) {
         console.error('Error fetching products:', error);
         setError('Failed to fetch products. Please try again later.');
@@ -107,7 +108,7 @@ function ShopItemList() {
 
   return (
     <Grid container direction="row" spacing={1}>
-      {filtered.map((product) => (
+      {filtered && filtered.map((product) => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
           <ShopItem
             id={product.id}

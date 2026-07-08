@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Card, CardContent, CardActions, Typography, Button, CardMedia, Box,
-  Dialog, DialogTitle, DialogContent, DialogActions,
+  Dialog, DialogTitle, DialogContent, DialogActions, Chip,
 } from '@mui/material';
 import { getImageUrl } from './ShopItem';
 
@@ -12,6 +12,10 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
   const itemPrice = Number(price);
   const itemQuantity = Number(quantity || 1);
   const subtotal = itemPrice * itemQuantity;
+
+  const discountPercent = is_on_sale && price && sale_price
+    ? Math.round(((price - sale_price) / price) * 100)
+    : 0;
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [removeQty, setRemoveQty] = useState(1);
@@ -42,7 +46,21 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
 
   return (
     <>
-      <Card style={{ minHeight: '400px' }}>
+      <Card style={{ minHeight: '400px', position: 'relative' }}>
+        {is_on_sale && (
+          <Chip
+            label={`${discountPercent}% OFF`}
+            color="error"
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              zIndex: 1,
+              fontWeight: 'bold'
+            }}
+          />
+        )}
         {displayImage && (
           <CardMedia
             component="img"
@@ -61,21 +79,26 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
             {description}
           </Typography>
 
-          <Typography variant="body1">
-            Price:{' '}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginTop: 1 }}>
+            <Typography variant="body2">Price:</Typography>
             {is_on_sale ? (
               <>
-                <span style={{ textDecoration: 'line-through', color: '#888', marginRight: 8 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+                >
                   ${Number(price).toFixed(2)}
-                </span>
-                <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
-                  ${Number(sale_price).toFixed(2)}
-                </span>
+                </Typography>
+                <Typography variant="body1" color="error" sx={{ fontWeight: 'bold' }}>
+                  ${itemPrice.toFixed(2)}
+                </Typography>
               </>
             ) : (
-              `$${itemPrice.toFixed(2)}`
+              <Typography variant="body1">
+                ${itemPrice.toFixed(2)}
+              </Typography>
             )}
-          </Typography>
+          </Box>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
             <Button
@@ -91,10 +114,6 @@ function CartItem({ product_id, name, description, image_url, price, is_on_sale,
               onClick={() => onQuantityChange(itemQuantity + 1)}
             >+</Button>
           </div>
-
-          <Typography variant="body1">
-            Subtotal: ${subtotal.toFixed(2)}
-          </Typography>
         </CardContent>
 
         <CardActions>
