@@ -5,16 +5,21 @@ import {
   Paper,
   TextField,
   Typography,
-  CircularProgress
+  CircularProgress,
+  Fab,
+  IconButton
 } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';
+import CloseIcon from '@mui/icons-material/Close';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 function ShoppingChatbot() {
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: 'Hi, I can help you decide what to add to your cart.'
+      text: 'Hello! I can help you decide what to add to your cart, or anything else you need help with.'
     }
   ]);
 
@@ -79,76 +84,169 @@ function ShoppingChatbot() {
   };
 
   return (
-    <Paper elevation={3} sx={{ padding: 2, marginTop: 3, marginBottom: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Shopping Assistant
-      </Typography>
-
-      <Typography variant="body2" sx={{ marginBottom: 2 }}>
-        Ask for help choosing what to add to your cart.
-      </Typography>
-
-      <Box
-        sx={{
-          border: '1px solid #ddd',
-          borderRadius: 1,
-          padding: 2,
-          height: 260,
-          overflowY: 'auto',
-          marginBottom: 2,
-          backgroundColor: '#fafafa'
-        }}
-      >
-        {messages.map((message, index) => (
-          <Box
-            key={index}
+    <>
+      {!isOpen && (
+        <Box
+          sx={{
+            position: 'fixed',
+            right: 24,
+            bottom: 24,
+            zIndex: 1300,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}
+        >
+          <Paper
+            elevation={3}
             sx={{
-              marginBottom: 1,
-              textAlign: message.sender === 'user' ? 'right' : 'left'
+              padding: '10px 14px',
+              backgroundColor: '#2f3136',
+              color: '#ffffff',
+              borderRadius: 1
             }}
           >
-            <Typography
-              variant="body2"
+            <Typography variant="body2">
+              Need help picking a product?
+            </Typography>
+          </Paper>
+
+          <Fab
+            color="primary"
+            aria-label="open shopping chatbot"
+            onClick={() => setIsOpen(true)}
+          >
+            <ChatIcon />
+          </Fab>
+        </Box>
+      )}
+
+      {isOpen && (
+        <Paper
+          elevation={6}
+          sx={{
+            position: 'fixed',
+            right: 24,
+            bottom: 24,
+            width: 360,
+            maxWidth: '90vw',
+            height: 500,
+            zIndex: 1300,
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#2f3136',
+            color: '#ffffff',
+            borderRadius: 2,
+            overflow: 'hidden'
+          }}
+        >
+          <Box
+            sx={{
+              padding: 2,
+              borderBottom: '1px solid #555',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <Typography variant="h6">
+              Chat Bot - Help
+            </Typography>
+
+            <IconButton
+              size="small"
+              onClick={() => setIsOpen(false)}
               sx={{
-                display: 'inline-block',
-                padding: 1,
-                borderRadius: 1,
-                maxWidth: '80%',
-                backgroundColor: message.sender === 'user' ? '#e3f2fd' : '#ffffff'
+                color: '#ffffff'
               }}
             >
-              {message.text}
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Box sx={{ padding: '8px 16px' }}>
+            <Typography variant="body2" sx={{ color: '#64a6ff', fontWeight: 'bold' }}>
+              We&apos;re Online
             </Typography>
           </Box>
-        ))}
 
-        {loading && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CircularProgress size={18} />
-            <Typography variant="body2">Thinking...</Typography>
+          <Box
+            sx={{
+              flex: 1,
+              padding: 2,
+              overflowY: 'auto',
+              backgroundColor: '#2b2b2b'
+            }}
+          >
+            {messages.map((message, index) => (
+              <Box
+                key={index}
+                sx={{
+                  marginBottom: 2,
+                  textAlign: message.sender === 'user' ? 'right' : 'left'
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: 'inline-block',
+                    padding: 1.25,
+                    borderRadius: 1,
+                    maxWidth: '80%',
+                    color: '#ffffff',
+                    backgroundColor: message.sender === 'user' ? '#9aa3ad' : '#4f7fb8',
+                    textAlign: 'left',
+                    whiteSpace: 'pre-line'
+                  }}
+                >
+                  {message.text}
+                </Typography>
+              </Box>
+            ))}
+
+            {loading && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CircularProgress size={18} />
+                <Typography variant="body2">Thinking...</Typography>
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
 
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <TextField
-          fullWidth
-          size="small"
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask what you should add to your cart..."
-        />
+          <Box
+            sx={{
+              padding: 1.5,
+              display: 'flex',
+              gap: 1,
+              backgroundColor: '#2f3136'
+            }}
+          >
+            <TextField
+              fullWidth
+              size="small"
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Enter message here..."
+              sx={{
+                backgroundColor: '#e8eef5',
+                borderRadius: 5,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 5
+                }
+              }}
+            />
 
-        <Button
-          variant="contained"
-          onClick={sendMessage}
-          disabled={loading}
-        >
-          Send
-        </Button>
-      </Box>
-    </Paper>
+            <Button
+              variant="contained"
+              onClick={sendMessage}
+              disabled={loading}
+            >
+              Send
+            </Button>
+          </Box>
+        </Paper>
+      )}
+    </>
   );
 }
 

@@ -3,6 +3,7 @@ import Head from '../components/head';
 import Link from 'next/link';
 
 import ShopItemList from '../components/ShopItemList';
+import ShoppingChatbot from '../components/ShoppingChatbot';
 import { Container, Typography } from '@mui/material';
 
 export const ShopPage = () => (
@@ -16,6 +17,8 @@ export const ShopPage = () => (
     </div>
 
     <ShopItemList />
+
+    <ShoppingChatbot />
   </Container>
 );
 
