@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Typography } from '@mui/material';
 import CartItem from './CartItem';
 
-function CartItemList() {
+function CartItemList({ sharedCart, onCartItemsChange }) {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
+    if (sharedCart) {
+      setCartItems(sharedCart);
+      return;
+    }
+
     const getCartItems = async () => {
       try {
         const response = await fetch('http://localhost:8000/v1/cartitems');
@@ -14,13 +19,36 @@ function CartItemList() {
         console.log('Cart items from API:', json);
 
         setCartItems(json);
+        if (onCartItemsChange) {
+          onCartItemsChange(json);
+        }
       } catch (error) {
         console.error('Error fetching cart items:', error);
       }
     };
 
     getCartItems();
-  }, []);
+  }, [sharedCart]);
+
+  const updateCartItemQuantity = async (id, newQuantity) => {
+    try {
+      const response = await fetch(`http://localhost:8000/v1/cartitems/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: newQuantity }),
+      });
+      if (response.ok) {
+        setCartItems(cartItems.map((item) =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        ));
+      } else {
+        const json = await response.json();
+        alert(json.message || 'Failed to update quantity.');
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+  };
 
   const deleteCartItem = async (id) => {
     try {
@@ -66,6 +94,7 @@ function CartItemList() {
               is_on_sale={item.is_on_sale}
               sale_price={item.sale_price}
               quantity={item.quantity || 1}
+              onQuantityChange={(newQty) => updateCartItemQuantity(item.id, newQty)}
               onDeleteItem={() => deleteCartItem(item.id)}
             />
           </Grid>

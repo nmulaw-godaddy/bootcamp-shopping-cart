@@ -11,6 +11,7 @@ function ShopItemList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const searchTerm = (router.query.q || '').toLowerCase();
 
 
   useEffect(() => {
@@ -93,9 +94,16 @@ function ShopItemList() {
   if (error) return <Typography color="error">{error}</Typography>;
   if (products.length === 0) return <Typography>No products available.</Typography>;
 
+  const filtered = searchTerm
+    ? products.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm) ||
+        (p.description || '').toLowerCase().includes(searchTerm)
+      )
+    : products;
+
   return (
     <Grid container direction="row" spacing={1}>
-      {products.map((product) => (
+      {filtered.map((product) => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
           <ShopItem
             id={product.id}
@@ -105,6 +113,7 @@ function ShopItemList() {
             price={product.price}
             is_on_sale={product.is_on_sale}
             sale_price={product.sale_price}
+            stockQuantity={product.quantity}
             onAddToCart={handleAddToCart}
             onAddToWishlist={handleAddToWishlist}
           />

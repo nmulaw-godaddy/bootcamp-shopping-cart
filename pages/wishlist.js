@@ -5,7 +5,7 @@ import WishlistItemList from '../components/WishlistItemList';
 
 function WishlistPage() {
   return (
-    <Container>
+    <Container sx={{ pt: 4 }}>
       <Typography variant="h3">My Wishlist</Typography>
 
       <div>

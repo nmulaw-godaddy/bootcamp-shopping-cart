@@ -14,7 +14,18 @@ const images = [
 function ShopItem({id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, onAddToWishlist}) {
 
   const imageIndex = id ? (Number(id) - 1) % images.length : 0;
-  const displayImage = image_url || images[imageIndex];
+  return image_url || images[imageIndex];
+}
+
+export function isOutOfStock(quantity) {
+  return Number(quantity) === 0;
+}
+
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart }) {
+
+  const displayImage = getImageUrl(id, image_url);
+  const outOfStock = isOutOfStock(stockQuantity);
+  const [selectedQty, setSelectedQty] = useState(1);
 
   const displayPrice = Number(is_on_sale ? sale_price : price);
 
@@ -27,7 +38,7 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
       price: displayPrice,
       is_on_sale,
       sale_price,
-      quantity: 1,
+      quantity: selectedQty,
     };
 
     onAddToCart(newItem);
@@ -48,7 +59,7 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
   };
 
   return (
-    <Card style={{ height: '400px' }}>
+    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column' }}>
       {displayImage && (
         <CardMedia
           component="img"
@@ -58,22 +69,53 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
         />
       )}
 
-      <CardContent>
+      <CardContent sx={{ flex: 1, overflow: 'hidden' }}>
         <Typography variant="h5" component="div">
           {name}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+        >
           {description}
         </Typography>
 
         <Typography variant="body1" color="text.primary">
-          ${displayPrice.toFixed(2)}
+          ${is_on_sale ? sale_price : price}
         </Typography>
+
+        {outOfStock && (
+          <Typography variant="body2" color="error">
+            Out of Stock
+          </Typography>
+        )}
+        {!outOfStock && stockQuantity < 5 && (
+          <Typography variant="body2" color="error">
+            Only {stockQuantity} remaining!
+          </Typography>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setSelectedQty(selectedQty - 1)}
+            disabled={outOfStock || selectedQty <= 1}
+          >−</Button>
+          <Typography variant="body1">{selectedQty}</Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setSelectedQty(selectedQty + 1)}
+            disabled={outOfStock || selectedQty >= stockQuantity}
+          >+</Button>
+        </div>
       </CardContent>
 
       <CardActions>
-        <Button variant="contained" color="primary" onClick={addToCart}>
+        <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock}>
           Add to Cart
         </Button>
 
