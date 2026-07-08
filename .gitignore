@@ -26,3 +26,4 @@ gasket.config.local.js*
 .docs
 
 
+.env.local
