@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Alert, Button, Stack, Box } from '@mui/material';
+import Link from 'next/link';
 import CartItemList from '../components/CartItemList';
 import { createCartShareUrl, decodeSharedCart } from '../utils/cartShare';
 
@@ -48,6 +49,11 @@ function Cart() {
       )}
 
       <CartItemList sharedCart={sharedCart} onCartItemsChange={setCurrentCartItems} />
+      
+        <Link href="/shop" passHref>                                  
+          <Button variant="contained">View shop</Button>              
+        </Link>
+      <CartItemList />
     </Container>
   );
 }

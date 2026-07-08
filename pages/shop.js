@@ -3,7 +3,7 @@ import Head from '../components/head';
 import Link from 'next/link';
 
 import ShopItemList from '../components/ShopItemList';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Button } from '@mui/material';
 
 export const ShopPage = () => (
   <Container>
@@ -11,9 +11,9 @@ export const ShopPage = () => (
 
     <Typography variant="h3">My Shop</Typography>
 
-    <div>
-      <Link href="/cart">View cart</Link>
-    </div>
+    <Link href="/cart" passHref>                                  
+          <Button variant="contained">View Cart</Button>              
+    </Link>
 
     <ShopItemList />
   </Container>
