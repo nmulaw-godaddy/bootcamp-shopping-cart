@@ -59,11 +59,12 @@ function Cart() {
         </Box>
       )}
 
+      <Link href="/shop" passHref>
+          <Button variant="contained">View shop</Button>
+      </Link>
+
       <CartItemList sharedCart={sharedCart} onCartItemsChange={setCurrentCartItems} />
 
-        <Link href="/shop" passHref>
-          <Button variant="contained">View shop</Button>
-        </Link>
     </Container>
   );
 }
