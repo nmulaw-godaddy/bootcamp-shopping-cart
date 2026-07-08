@@ -1,5 +1,6 @@
 import React from 'react';
-import {Card, CardContent, CardActions, Typography, Button, CardMedia} from '@mui/material';
+import {Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Icon} from '@mui/material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 const images = [
   "https://img1.wsimg.com/cdn/Image/All/AllChannelsFoS/1/en-US/c8d98599-46cc-412d-bbb5-d766bb0e5a05/Product-grid-SSL.jpg",
@@ -11,6 +12,7 @@ const images = [
 ];
 
 function ShopItem({id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, onAddToWishlist}) {
+
   const imageIndex = id ? (Number(id) - 1) % images.length : 0;
   const displayImage = image_url || images[imageIndex];
 
@@ -22,7 +24,7 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
       name,
       description,
       image_url: displayImage,
-      price,
+      price: displayPrice,
       is_on_sale,
       sale_price,
       quantity: 1,
@@ -37,7 +39,7 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
       name,
       description,
       image_url: displayImage,
-      price,
+      price: displayPrice,
       is_on_sale,
       sale_price,
     };
@@ -75,9 +77,9 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
           Add to Cart
         </Button>
 
-        <Button variant="outlined" color="secondary" onClick={addToWishlist}>
-          Add to Wishlist
-        </Button>
+        <IconButton color="secondary" onClick={addToWishlist}>
+          <FavoriteBorderIcon />
+        </IconButton>
       </CardActions>
     </Card>
   );

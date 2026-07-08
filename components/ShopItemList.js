@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@mui/material';
+import { Grid, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import ShopItem from './ShopItem';
 
@@ -7,9 +7,11 @@ function ShopItemList() {
   const getProductsUrl = 'http://localhost:8000/v1/products';
   const addToCartUrl = 'http://localhost:8000/v1/cartitems';
   const addToWishlistUrl = 'http://localhost:8000/v1/wishlistitems';
-
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const router = useRouter();
+
 
   useEffect(() => {
     const getProducts = async () => {
@@ -22,6 +24,9 @@ function ShopItemList() {
         setProducts(json);
       } catch (error) {
         console.error('Error fetching products:', error);
+        setError('Failed to fetch products. Please try again later.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -83,6 +88,10 @@ function ShopItemList() {
       console.error('Error adding to wishlist:', error);
     }
   };
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
+  if (products.length === 0) return <Typography>No products available.</Typography>;
 
   return (
     <Grid container direction="row" spacing={1}>

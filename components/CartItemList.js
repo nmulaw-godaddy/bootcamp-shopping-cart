@@ -45,7 +45,7 @@ function CartItemList() {
 
   const totalPrice = cartItems
     .map((item) => {
-      const itemPrice = Number(item.is_on_sale ? item.sale_price : item.price);
+      const itemPrice = Number(item.price);
       const quantity = Number(item.quantity || 1);
 
       return quantity * itemPrice;
