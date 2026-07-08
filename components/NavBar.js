@@ -32,15 +32,22 @@ export default function NavBar() {
     <AppBar position="static">
       <Toolbar sx={{ gap: 2 }}>
         {/* Left: logo + title */}
-        <Box
-          component="img"
-          src={doughmainLogo.src}
-          alt="Doughmain logo"
-          sx={{ width: 36, height: 36, borderRadius: 1, objectFit: 'contain', flexShrink: 0 }}
-        />
-        <Typography variant="h6" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
-          Doughmain Products
-        </Typography>
+        <Link href="/shop" passHref legacyBehavior>
+          <Box
+            component="a"
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}
+          >
+            <Box
+              component="img"
+              src={doughmainLogo.src}
+              alt="Doughmain logo"
+              sx={{ width: 36, height: 36, borderRadius: 1, objectFit: 'contain', flexShrink: 0 }}
+            />
+            <Typography variant="h6" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
+              Doughmain Products
+            </Typography>
+          </Box>
+        </Link>
 
         {/* Center: search */}
         <Box
