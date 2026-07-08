@@ -42,7 +42,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
   };
 
   return (
-    <Card style={{ minHeight: '400px' }} sx={{ opacity: outOfStock ? 0.5 : 1 }}>
+    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column' }}>
       {displayImage && (
         <CardMedia
           component="img"
@@ -52,12 +52,16 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
         />
       )}
 
-      <CardContent>
+      <CardContent sx={{ flex: 1, overflow: 'hidden' }}>
         <Typography variant="h5" component="div">
           {name}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+        >
           {description}
         </Typography>
 
@@ -68,6 +72,11 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
         {outOfStock && (
           <Typography variant="body2" color="error">
             Out of Stock
+          </Typography>
+        )}
+        {!outOfStock && stockQuantity < 5 && (
+          <Typography variant="body2" color="error">
+            Only {stockQuantity} remaining!
           </Typography>
         )}
 
