@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardActions, Typography, Button, CardMedia } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Button, CardMedia, Chip, Box } from '@mui/material';
 
 const images = [
  "https://img1.wsimg.com/cdn/Image/All/AllChannelsFoS/1/en-US/c8d98599-46cc-412d-bbb5-d766bb0e5a05/Product-grid-SSL.jpg",
@@ -41,8 +41,26 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
     onAddToCart(newItem);
   };
 
+  const discountPercent = is_on_sale && price && sale_price
+    ? Math.round(((price - sale_price) / price) * 100)
+    : 0;
+
   return (
-    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {is_on_sale && (
+        <Chip
+          label={`${discountPercent}% OFF`}
+          color="error"
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            zIndex: 1,
+            fontWeight: 'bold'
+          }}
+        />
+      )}
       {displayImage && (
         <CardMedia
           component="img"
@@ -65,9 +83,25 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
           {description}
         </Typography>
 
-        <Typography variant="body1" color="text.primary">
-          ${is_on_sale ? sale_price : price}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {is_on_sale ? (
+            <>
+              <Typography
+                variant="body2"
+                sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+              >
+                ${price}
+              </Typography>
+              <Typography variant="h6" color="error" sx={{ fontWeight: 'bold' }}>
+                ${sale_price}
+              </Typography>
+            </>
+          ) : (
+            <Typography variant="h6" color="text.primary">
+              ${price}
+            </Typography>
+          )}
+        </Box>
 
         {outOfStock && (
           <Typography variant="body2" color="error">
