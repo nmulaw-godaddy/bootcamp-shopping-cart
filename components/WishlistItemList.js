@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import WishlistItem from './WishlistItem';
 
 function WishlistItemList() {
+  const router = useRouter();
   const [wishlistItems, setWishlistItems] = useState([]);
 
   useEffect(() => {
@@ -28,6 +30,32 @@ function WishlistItemList() {
 
     getWishlistItems();
   }, []);
+
+  const addToCart = async (item) => {
+    try {
+      const response = await fetch('http://localhost:8000/v1/cartitems', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: item.product_id,
+          name: item.name,
+          description: item.description,
+          image_url: item.image_url,
+          price: item.price,
+          is_on_sale: item.is_on_sale,
+          sale_price: item.sale_price,
+          quantity: 1,
+        }),
+      });
+      if (!response.ok) {
+        console.error('Failed to add to cart:', response.status);
+        return;
+      }
+      router.push('/cart');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+  };
 
   const deleteWishlistItem = async (id) => {
     try {
@@ -63,6 +91,7 @@ function WishlistItemList() {
                 is_on_sale={item.is_on_sale}
                 sale_price={item.sale_price}
                 onDeleteItem={() => deleteWishlistItem(item.id)}
+                onAddToCart={() => addToCart(item)}
               />
             </Grid>
           ))}

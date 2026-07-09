@@ -10,14 +10,14 @@ const images = [
   "https://img1.wsimg.com/cdn/Image/All/FOS-Intl/1/en-US/3b91b99f-57eb-44bd-b2e1-1cfd6529bbfb/feat-ols-your-store-your-way.jpg?impolicy=cms-feature-module"
 ];
 
-function WishlistItem({ product_id, name, description, image_url, price, is_on_sale, sale_price, onDeleteItem }) {
+function WishlistItem({ product_id, name, description, image_url, price, is_on_sale, sale_price, onDeleteItem, onAddToCart }) {
   const imageIndex = product_id ? (Number(product_id) - 1) % images.length : 0;
   const displayImage = image_url || images[imageIndex];
 
   const itemPrice = Number(is_on_sale ? sale_price : price);
 
   return (
-    <Card style={{ height: '400px' }}>
+    <Card>
       {displayImage && (
         <CardMedia
           component="img"
@@ -42,6 +42,9 @@ function WishlistItem({ product_id, name, description, image_url, price, is_on_s
       </CardContent>
 
       <CardActions>
+        <Button variant="contained" color="primary" onClick={onAddToCart}>
+          Add to Cart
+        </Button>
         <Button variant="contained" color="error" onClick={onDeleteItem}>
           Remove
         </Button>
