@@ -90,6 +90,84 @@ function ShoppingChatbot() {
     }
   };
 
+  const renderMessageContent = (message) => {
+    const isTobyMessage =
+  message.sender === 'bot' &&
+  message.text.toLowerCase().includes('best cat') &&
+  message.text.toLowerCase().includes('toby');
+
+    if (!isTobyMessage) {
+      return (
+        <Typography
+          variant="body2"
+          sx={{
+            display: 'inline-block',
+            padding: 1.25,
+            borderRadius: 1,
+            color: '#ffffff',
+            backgroundColor: message.sender === 'user' ? '#9aa3ad' : '#4f7fb8',
+            whiteSpace: 'pre-line'
+          }}
+        >
+          {message.text}
+        </Typography>
+      );
+    }
+
+    const messageParts = message.text.split('\n\n');
+    const firstPart = messageParts[0];
+    const remainingText = messageParts.slice(1).join('\n\n');
+
+    return (
+      <>
+        <Typography
+          variant="body2"
+          sx={{
+            display: 'inline-block',
+            padding: 1.25,
+            borderRadius: 1,
+            color: '#ffffff',
+            backgroundColor: '#4f7fb8',
+            whiteSpace: 'pre-line'
+          }}
+        >
+          {firstPart}
+        </Typography>
+
+        <Box
+          component="img"
+          src="/images/toby.png"
+          alt="Toby the cat"
+          sx={{
+            display: 'block',
+            width: 160,
+            maxWidth: '100%',
+            marginTop: 1,
+            borderRadius: 2,
+            border: '2px solid #4f7fb8'
+          }}
+        />
+
+        {remainingText && (
+          <Typography
+            variant="body2"
+            sx={{
+              display: 'inline-block',
+              padding: 1.25,
+              borderRadius: 1,
+              color: '#ffffff',
+              backgroundColor: '#4f7fb8',
+              whiteSpace: 'pre-line',
+              marginTop: 1
+            }}
+          >
+            {remainingText}
+          </Typography>
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       {!isOpen && (
@@ -193,21 +271,15 @@ function ShoppingChatbot() {
                   textAlign: message.sender === 'user' ? 'right' : 'left'
                 }}
               >
-                <Typography
-                  variant="body2"
+                <Box
                   sx={{
                     display: 'inline-block',
-                    padding: 1.25,
-                    borderRadius: 1,
                     maxWidth: '80%',
-                    color: '#ffffff',
-                    backgroundColor: message.sender === 'user' ? '#9aa3ad' : '#4f7fb8',
-                    textAlign: 'left',
-                    whiteSpace: 'pre-line'
+                    textAlign: 'left'
                   }}
                 >
-                  {message.text}
-                </Typography>
+                  {renderMessageContent(message)}
+                </Box>
               </Box>
             ))}
 
