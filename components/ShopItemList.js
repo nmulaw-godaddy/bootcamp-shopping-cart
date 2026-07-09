@@ -11,6 +11,7 @@ function ShopItemList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const searchTerm = (router.query.q || '').toLowerCase();
 
 
   useEffect(() => {
@@ -21,7 +22,8 @@ function ShopItemList() {
         });
 
         const json = await response.json();
-        setProducts(json);
+        console.log('API response:', json);
+        setProducts(Array.isArray(json) ? json : []);
       } catch (error) {
         console.error('Error fetching products:', error);
         setError('Failed to fetch products. Please try again later.');
@@ -35,25 +37,35 @@ function ShopItemList() {
 
   const handleAddToCart = async (product) => {
     try {
-      console.log('Product being added to cart:', product);
+      const cartResponse = await fetch(addToCartUrl);
+      const cartItems = cartResponse.ok ? await cartResponse.json() : [];
+      const existing = Array.isArray(cartItems)
+        ? cartItems.find((item) => item.product_id === product.product_id)
+        : null;
 
-      const body = JSON.stringify(product);
-
-      const response = await fetch(addToCartUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body,
-      });
-
-      console.log('Add to cart response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Add to cart failed:', errorText);
-        return;
+      if (existing) {
+        const newQty = Number(existing.quantity || 1) + Number(product.quantity || 1);
+        const patchResponse = await fetch(`${addToCartUrl}/${existing.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quantity: newQty }),
+        });
+        if (!patchResponse.ok) {
+          console.error('Failed to update cart item quantity');
+          return;
+        }
+      } else {
+        const postResponse = await fetch(addToCartUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(product),
+        });
+        if (!postResponse.ok) {
+          console.error('Failed to add item to cart');
+          return;
+        }
       }
+
 
       router.push('/cart');
     } catch (error) {
@@ -63,23 +75,16 @@ function ShopItemList() {
 
   const handleAddToWishlist = async (product) => {
     try {
-      console.log('Product being added to wishlist:', product);
-
       const body = JSON.stringify(product);
 
       const response = await fetch(addToWishlistUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body,
       });
 
-      console.log('Add to wishlist response status:', response.status);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Add to wishlist failed:', errorText);
+        console.error('Add to wishlist failed:', await response.text());
         return;
       }
 
@@ -93,9 +98,17 @@ function ShopItemList() {
   if (error) return <Typography color="error">{error}</Typography>;
   if (products.length === 0) return <Typography>No products available.</Typography>;
 
+  const safeProducts = Array.isArray(products) ? products : [];
+  const filtered = searchTerm
+    ? safeProducts.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm) ||
+        (p.description || '').toLowerCase().includes(searchTerm)
+      )
+    : safeProducts;
+
   return (
     <Grid container direction="row" spacing={1}>
-      {products.map((product) => (
+      {filtered && filtered.map((product) => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
           <ShopItem
             id={product.id}
@@ -105,6 +118,7 @@ function ShopItemList() {
             price={product.price}
             is_on_sale={product.is_on_sale}
             sale_price={product.sale_price}
+            stockQuantity={product.quantity}
             onAddToCart={handleAddToCart}
             onAddToWishlist={handleAddToWishlist}
           />

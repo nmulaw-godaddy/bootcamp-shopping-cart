@@ -15,7 +15,7 @@ build
 # misc
 .env
 .idea
-*.iml
+*.iml run lo
 *.log
 *.bak
 .DS_Store
@@ -26,3 +26,4 @@ gasket.config.local.js*
 .docs
 
 
+.env.local

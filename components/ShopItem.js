@@ -1,5 +1,5 @@
-import React from 'react';
-import {Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Icon} from '@mui/material';
+import React, { useState } from 'react';
+import { Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Chip, Box } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 const images = [
@@ -11,10 +11,20 @@ const images = [
   "https://img1.wsimg.com/cdn/Image/All/FOS-Intl/1/en-US/3b91b99f-57eb-44bd-b2e1-1cfd6529bbfb/feat-ols-your-store-your-way.jpg?impolicy=cms-feature-module"
 ];
 
-function ShopItem({id, name, description, image_url, price, is_on_sale, sale_price, onAddToCart, onAddToWishlist}) {
-
+export function getImageUrl(id, image_url) {
   const imageIndex = id ? (Number(id) - 1) % images.length : 0;
-  const displayImage = image_url || images[imageIndex];
+  return image_url || images[imageIndex];
+}
+
+export function isOutOfStock(quantity) {
+  return Number(quantity) === 0;
+}
+
+function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart, onAddToWishlist }) {
+
+  const displayImage = getImageUrl(id, image_url);
+  const outOfStock = isOutOfStock(stockQuantity);
+  const [selectedQty, setSelectedQty] = useState(1);
 
   const displayPrice = Number(is_on_sale ? sale_price : price);
 
@@ -27,7 +37,7 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
       price: displayPrice,
       is_on_sale,
       sale_price,
-      quantity: 1,
+      quantity: selectedQty,
     };
 
     onAddToCart(newItem);
@@ -47,8 +57,26 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
     onAddToWishlist(newItem);
   };
 
+  const discountPercent = is_on_sale && price && sale_price
+    ? Math.round(((price - sale_price) / price) * 100)
+    : 0;
+
   return (
-    <Card style={{ height: '400px' }}>
+    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {is_on_sale && (
+        <Chip
+          label={`${discountPercent}% OFF`}
+          color="error"
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            zIndex: 1,
+            fontWeight: 'bold'
+          }}
+        />
+      )}
       {displayImage && (
         <CardMedia
           component="img"
@@ -58,22 +86,69 @@ function ShopItem({id, name, description, image_url, price, is_on_sale, sale_pri
         />
       )}
 
-      <CardContent>
+      <CardContent sx={{ flex: 1, overflow: 'hidden' }}>
         <Typography variant="h5" component="div">
           {name}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+        >
           {description}
         </Typography>
 
-        <Typography variant="body1" color="text.primary">
-          ${displayPrice.toFixed(2)}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {is_on_sale ? (
+            <>
+              <Typography
+                variant="body2"
+                sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+              >
+                ${price}
+              </Typography>
+              <Typography variant="h6" color="error" sx={{ fontWeight: 'bold' }}>
+                ${sale_price}
+              </Typography>
+            </>
+          ) : (
+            <Typography variant="h6" color="text.primary">
+              ${price}
+            </Typography>
+          )}
+        </Box>
+
+        {outOfStock && (
+          <Typography variant="body2" color="error">
+            Out of Stock
+          </Typography>
+        )}
+        {!outOfStock && stockQuantity < 5 && (
+          <Typography variant="body2" color="error">
+            Only {stockQuantity} remaining!
+          </Typography>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setSelectedQty(selectedQty - 1)}
+            disabled={outOfStock || selectedQty <= 1}
+          >−</Button>
+          <Typography variant="body1">{selectedQty}</Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setSelectedQty(selectedQty + 1)}
+            disabled={outOfStock || selectedQty >= stockQuantity}
+          >+</Button>
+        </div>
       </CardContent>
 
       <CardActions>
-        <Button variant="contained" color="primary" onClick={addToCart}>
+        <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock}>
           Add to Cart
         </Button>
 

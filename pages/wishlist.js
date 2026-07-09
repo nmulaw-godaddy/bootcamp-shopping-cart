@@ -1,20 +1,21 @@
 import React from 'react';
 import Link from 'next/link';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Button, Stack } from '@mui/material';
 import WishlistItemList from '../components/WishlistItemList';
 
 function WishlistPage() {
   return (
-    <Container>
+    <Container sx={{ pt: 4 }}>
       <Typography variant="h3">My Wishlist</Typography>
 
-      <div>
-        <Link href="/shop">Back to shop</Link>
-      </div>
-
-      <div>
-        <Link href="/cart">View Cart</Link>
-      </div>
+      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+        <Link href="/shop" passHref>
+          <Button variant="contained">View shop</Button>
+        </Link>
+        <Link href="/cart" passHref>
+          <Button variant="contained">View Cart</Button>
+        </Link>
+      </Stack>
 
       <WishlistItemList />
     </Container>
