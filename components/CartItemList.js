@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Typography, TextField, Button, Box, Alert, Chip } from '@mui/material';
+import Link from 'next/link';
 import CartItem from './CartItem';
 
 function CartItemList({ sharedCart, onCartItemsChange }) {
@@ -19,9 +20,7 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
       try {
         const response = await fetch('http://localhost:8000/v1/cartitems');
         const json = await response.json();
-
         console.log('Cart items from API:', json);
-
         setCartItems(Array.isArray(json) ? json : []);
         if (onCartItemsChange) {
           onCartItemsChange(json);
@@ -68,13 +67,10 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
   const deleteCartItem = async (id) => {
     try {
       console.log('Deleting cart item id:', id);
-
       const response = await fetch(`http://localhost:8000/v1/cartitems/${id}`, {
         method: 'DELETE',
       });
-
       console.log('Delete response status:', response.status);
-
       if (response.ok) {
         const newItems = cartItems.filter((item) => item.id !== id);
         setCartItems(newItems);
@@ -167,11 +163,7 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
 
         {appliedPromo ? (
           <Box sx={{ marginBottom: 2 }}>
-            <Alert
-              severity="success"
-              onClose={removePromoCode}
-              sx={{ marginBottom: 2 }}
-            >
+            <Alert severity="success" onClose={removePromoCode} sx={{ marginBottom: 2 }}>
               <strong>{appliedPromo.promo_code.code}</strong> applied!
               {appliedPromo.promo_code.description && ` - ${appliedPromo.promo_code.description}`}
             </Alert>
@@ -190,22 +182,12 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
                 sx={{
                   flex: 1,
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'white',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'white',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'white',
-                    },
+                    '& fieldset': { borderColor: 'white' },
+                    '&:hover fieldset': { borderColor: 'white' },
+                    '&.Mui-focused fieldset': { borderColor: 'white' },
                   },
-                  '& .MuiInputLabel-root': {
-                    color: 'white',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
-                  },
+                  '& .MuiInputLabel-root': { color: 'white' },
+                  '& .MuiInputBase-input': { color: 'white' },
                 }}
               />
               <Button
@@ -238,9 +220,7 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
                         cursor: 'pointer',
                         backgroundColor: 'primary.main',
                         color: 'white',
-                        '&:hover': {
-                          backgroundColor: 'primary.dark',
-                        }
+                        '&:hover': { backgroundColor: 'primary.dark' }
                       }}
                     />
                   ))}
@@ -258,9 +238,7 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
 
           {appliedPromo && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 1, color: 'green' }}>
-              <Typography>
-                Discount ({appliedPromo.promo_code.discount_percent}%):
-              </Typography>
+              <Typography>Discount ({appliedPromo.promo_code.discount_percent}%):</Typography>
               <Typography>-${appliedPromo.discount_amount.toFixed(2)}</Typography>
             </Box>
           )}
@@ -273,9 +251,27 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
           </Box>
         </Box>
       </Box>
+
+      <Box sx={{ paddingTop: '20px' }}>
+        <Link href="/checkout" passHref>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            disabled={cartItems.length === 0}
+            style={{ marginRight: '12px' }}
+          >
+            Proceed to Checkout
+          </Button>
+        </Link>
+        <Link href="/shop" passHref>
+          <Button variant="outlined" size="large">
+            Continue Shopping
+          </Button>
+        </Link>
+      </Box>
     </div>
   );
 }
 
 export default CartItemList;
-  

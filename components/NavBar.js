@@ -5,9 +5,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import doughmainLogo from '../images/doughmains.png';
+import { useAuth } from './AuthContext';
 
 export default function NavBar() {
   const router = useRouter();
+  const { user, logout } = useAuth();
   const [search, setSearch] = useState(router.query.q || '');
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
@@ -244,6 +246,20 @@ export default function NavBar() {
             )}
           </Box>
         </Popover>
+        {user ? (
+          <>
+            <Typography variant="body2" sx={{ opacity: 0.85, whiteSpace: 'nowrap' }}>
+              Hi, {user.name}
+            </Typography>
+            <Button color="inherit" onClick={logout}>Log Out</Button>
+          </>
+        ) : (
+          <Link href="/login" passHref legacyBehavior>
+            <Button color="inherit" variant="outlined" sx={{ borderColor: 'rgba(255,255,255,0.5)' }}>
+              Log In
+            </Button>
+          </Link>
+        )}
       </Toolbar>
     </AppBar>
   );
