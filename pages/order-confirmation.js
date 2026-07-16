@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Divider, Grid, } from '@mui/material';
-import LoadingDoughnut from '../components/LoadingDoughnut';
+import { Container, Typography, Button, Divider, CircularProgress, Grid, } from '@mui/material';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -38,7 +37,7 @@ function OrderConfirmation() {
   if (loading) {
     return (
       <Container style={{ paddingTop: '80px', textAlign: 'center' }}>
-        <LoadingDoughnut />
+        <CircularProgress />
       </Container>
     );
   }

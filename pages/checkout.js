@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Grid, Typography, TextField, Button, Divider, } from '@mui/material';
-import LoadingDoughnut from '../components/LoadingDoughnut';
+  Container, Grid, Typography, TextField, Button, Divider, CircularProgress, } from '@mui/material';
 import { useRouter } from 'next/router';
 
 function Checkout() {
@@ -213,7 +212,7 @@ function Checkout() {
             </Typography>
 
             {loadingCart ? (
-              <LoadingDoughnut size={80} />
+              <CircularProgress />
             ) : (
               <>
                 {cartItems.map((item) => (
