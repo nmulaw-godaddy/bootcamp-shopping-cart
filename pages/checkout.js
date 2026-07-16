@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Grid, Typography, TextField, Button, Divider, CircularProgress, } from '@mui/material';
+  Container, Grid, Typography, TextField, Button, Divider, CircularProgress, Paper, } from '@mui/material';
 import { useRouter } from 'next/router';
 
 function Checkout() {
@@ -84,7 +84,7 @@ function Checkout() {
 
   return (
     <Container maxWidth="lg" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
         Checkout
       </Typography>
 
@@ -93,6 +93,7 @@ function Checkout() {
 
           {/* LEFT COLUMN — Shipping + Payment */}
           <Grid item xs={12} md={7}>
+          <Paper elevation={3} sx={{ p: 3, bgcolor: 'white', color: 'black' }}>
 
             <Typography variant="h6" gutterBottom>
               Shipping Information
@@ -203,10 +204,12 @@ function Checkout() {
                 />
               </Grid>
             </Grid>
+          </Paper>
           </Grid>
 
           {/* RIGHT COLUMN — Order Summary */}
           <Grid item xs={12} md={5}>
+          <Paper elevation={3} sx={{ p: 3, bgcolor: 'white', color: 'black' }}>
             <Typography variant="h6" gutterBottom>
               Order Summary
             </Typography>
@@ -262,6 +265,7 @@ function Checkout() {
             >
               {submitting ? 'Placing Order...' : 'Place Order'}
             </Button>
+          </Paper>
           </Grid>
 
         </Grid>

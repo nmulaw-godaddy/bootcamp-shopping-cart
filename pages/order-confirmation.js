@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Divider, CircularProgress, Grid, } from '@mui/material';
+import { Container, Typography, Button, Divider, CircularProgress, Grid, Paper, } from '@mui/material';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -34,6 +34,7 @@ function OrderConfirmation() {
     fetchOrder();
   }, [orderId]);
 
+
   if (loading) {
     return (
       <Container style={{ paddingTop: '80px', textAlign: 'center' }}>
@@ -65,58 +66,61 @@ function OrderConfirmation() {
 
   return (
     <Container maxWidth="sm" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
-
-      <Typography variant="h4" gutterBottom>
-        Order Confirmed!
-      </Typography>
-      <Typography variant="body1" color="text.secondary" gutterBottom>
-        Thank you for your purchase, {order.name}. Your order has been placed successfully.
+      <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
+        Order Confirmed! 🍩
       </Typography>
 
-      <Divider style={{ margin: '24px 0' }} />
+      <Paper elevation={3} sx={{ p: 3, bgcolor: 'white', color: 'black' }}>
 
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <Typography variant="body2" color="text.secondary">Order Number</Typography>
-          <Typography variant="body1">#{order.id}</Typography>
+        <Typography variant="body1" gutterBottom>
+          Thank you for your purchase, {order.name}. Your order has been placed successfully.
+        </Typography>
+
+        <Divider style={{ margin: '24px 0' }} />
+
+        <Grid container spacing={1}>
+          <Grid item xs={6}>
+            <Typography variant="body2" color="text.secondary">Order Number</Typography>
+            <Typography variant="body1">#{order.id}</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body2" color="text.secondary">Estimated Delivery</Typography>
+            <Typography variant="body1">{deliveryString}</Typography>
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Typography variant="body2" color="text.secondary">Estimated Delivery</Typography>
-          <Typography variant="body1">{deliveryString}</Typography>
+
+        <Divider style={{ margin: '24px 0' }} />
+
+        <Typography variant="h6" gutterBottom>
+          Shipping Address
+        </Typography>
+        <Typography variant="body1">{order.name}</Typography>
+        <Typography variant="body1">{order.address}</Typography>
+        <Typography variant="body1">
+          {order.city}, {order.state} {order.zip_code}
+        </Typography>
+        <Typography variant="body1">{order.email}</Typography>
+
+        <Divider style={{ margin: '24px 0' }} />
+
+        <Grid container justifyContent="space-between">
+          <Typography variant="h6">Total Charged</Typography>
+          <Typography variant="h6">${Number(order.total_price).toFixed(2)}</Typography>
         </Grid>
-      </Grid>
 
-      <Divider style={{ margin: '24px 0' }} />
+        <Link href="/shop" passHref>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            size="large"
+            style={{ marginTop: '32px' }}
+          >
+            Continue Shopping
+          </Button>
+        </Link>
 
-      <Typography variant="h6" gutterBottom>
-        Shipping Address
-      </Typography>
-      <Typography variant="body1">{order.name}</Typography>
-      <Typography variant="body1">{order.address}</Typography>
-      <Typography variant="body1">
-        {order.city}, {order.state} {order.zip_code}
-      </Typography>
-      <Typography variant="body1">{order.email}</Typography>
-
-      <Divider style={{ margin: '24px 0' }} />
-
-      <Grid container justifyContent="space-between">
-        <Typography variant="h6">Total Charged</Typography>
-        <Typography variant="h6">${Number(order.total_price).toFixed(2)}</Typography>
-      </Grid>
-
-      <Link href="/shop" passHref>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          size="large"
-          style={{ marginTop: '32px' }}
-        >
-          Continue Shopping
-        </Button>
-      </Link>
-
+      </Paper>
     </Container>
   );
 }
