@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, CircularProgress } from '@mui/material';
+import { Grid, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
+
 import { useRouter } from 'next/router';
 import ShopItem from './ShopItem';
 
@@ -10,6 +11,8 @@ function ShopItemList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistToastOpen, setWishlistToastOpen] = useState(false);
+  const [wishlistToastItem, setWishlistToastItem] = useState('');
   const router = useRouter();
   const searchTerm = (router.query.q || '').toLowerCase();
 
@@ -88,7 +91,8 @@ function ShopItemList() {
         return;
       }
 
-      router.push('/wishlist');
+      setWishlistToastItem(product.name);
+      setWishlistToastOpen(true);
     } catch (error) {
       console.error('Error adding to wishlist:', error);
     }
@@ -107,6 +111,18 @@ function ShopItemList() {
     : safeProducts;
 
   return (
+    <>
+      <Snackbar
+        open={wishlistToastOpen}
+        autoHideDuration={3000}
+        onClose={() => setWishlistToastOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setWishlistToastOpen(false)} severity="success" variant="filled">
+          ❤️ <strong>{wishlistToastItem}</strong> added to your wishlist!
+        </Alert>
+      </Snackbar>
+
     <Grid container direction="row" spacing={1}>
       {filtered && filtered.map((product) => (
         <Grid item xs={12} sm={6} md={4} key={product.id}>
@@ -125,6 +141,7 @@ function ShopItemList() {
         </Grid>
       ))}
     </Grid>
+    </>
   );
 }
 
