@@ -130,6 +130,7 @@ function ShopItemList() {
             id={product.id}
             name={product.name}
             description={product.description}
+            long_description={product.long_description}
             image_url={product.image_url}
             price={product.price}
             is_on_sale={product.is_on_sale}
