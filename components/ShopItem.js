@@ -21,7 +21,7 @@ export function isOutOfStock(quantity) {
   return Number(quantity) === 0;
 }
 
-function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart, onAddToWishlist }) {
+function ShopItem({ id, name, description, long_description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart, onAddToWishlist }) {
 
   const displayImage = getImageUrl(id, image_url);
   const outOfStock = isOutOfStock(stockQuantity);
@@ -75,9 +75,15 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
 
           <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: 'white' }}>{name}</Typography>
 
-          <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255,255,255,0.8)' }}>
+          <Typography variant="body2" sx={{ mb: long_description ? 1 : 2, color: 'rgba(255,255,255,0.8)' }}>
             {description}
           </Typography>
+
+          {long_description && (
+            <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255,255,255,0.65)' }}>
+              {long_description}
+            </Typography>
+          )}
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
             {is_on_sale ? (
