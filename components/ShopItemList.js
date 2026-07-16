@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
-
 import { useRouter } from 'next/router';
 import ShopItem from './ShopItem';
 
@@ -13,6 +12,8 @@ function ShopItemList() {
   const [error, setError] = useState(null);
   const [wishlistToastOpen, setWishlistToastOpen] = useState(false);
   const [wishlistToastItem, setWishlistToastItem] = useState('');
+  const [cartToastOpen, setCartToastOpen] = useState(false);
+  const [cartToastItem, setCartToastItem] = useState('');
   const router = useRouter();
   const searchTerm = (router.query.q || '').toLowerCase();
 
@@ -70,7 +71,8 @@ function ShopItemList() {
       }
 
 
-      router.push('/cart');
+      setCartToastItem(product.name);
+      setCartToastOpen(true);
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
@@ -120,6 +122,17 @@ function ShopItemList() {
       >
         <Alert onClose={() => setWishlistToastOpen(false)} severity="success" variant="filled">
           ❤️ <strong>{wishlistToastItem}</strong> added to your wishlist!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={cartToastOpen}
+        autoHideDuration={3000}
+        onClose={() => setCartToastOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setCartToastOpen(false)} severity="info" variant="filled">
+          🛒 <strong>{cartToastItem}</strong> added to your cart!
         </Alert>
       </Snackbar>
 
