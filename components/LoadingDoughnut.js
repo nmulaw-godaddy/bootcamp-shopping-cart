@@ -1,5 +1,11 @@
+import { keyframes } from '@emotion/react';
 import doughmainLogo from '../images/doughmains.png';
 import Box from '@mui/material/Box';
+
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+`;
 
 export default function LoadingDoughnut({ size = 100 }) {
   return (
@@ -12,11 +18,8 @@ export default function LoadingDoughnut({ size = 100 }) {
           width: size,
           height: size,
           objectFit: 'contain',
-          animation: 'spin 3s linear infinite',
-          '@keyframes spin': {
-            '0%': { transform: 'rotate(0deg)' },
-            '100%': { transform: 'rotate(360deg)' },
-          },
+          animation: `${spin} 3s linear 1 forwards`,
+          transformOrigin: 'center center',
         }}
       />
     </Box>
