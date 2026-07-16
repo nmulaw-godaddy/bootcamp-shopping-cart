@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Chip, Box } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Chip, Box, Dialog, DialogContent } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import CloseIcon from '@mui/icons-material/Close';
 
 const images = [
   "https://img1.wsimg.com/cdn/Image/All/AllChannelsFoS/1/en-US/c8d98599-46cc-412d-bbb5-d766bb0e5a05/Product-grid-SSL.jpg",
@@ -25,11 +26,12 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
   const displayImage = getImageUrl(id, image_url);
   const outOfStock = isOutOfStock(stockQuantity);
   const [selectedQty, setSelectedQty] = useState(1);
+  const [open, setOpen] = useState(false);
 
   const displayPrice = Number(is_on_sale ? sale_price : price);
 
   const addToCart = () => {
-    const newItem = {
+    onAddToCart({
       product_id: id,
       name,
       description,
@@ -38,13 +40,11 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       is_on_sale,
       sale_price,
       quantity: selectedQty,
-    };
-
-    onAddToCart(newItem);
+    });
   };
 
   const addToWishlist = () => {
-    const newItem = {
+    onAddToWishlist({
       product_id: id,
       name,
       description,
@@ -52,9 +52,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       price: displayPrice,
       is_on_sale,
       sale_price,
-    };
-
-    onAddToWishlist(newItem);
+    });
   };
 
   const discountPercent = is_on_sale && price && sale_price
@@ -62,7 +60,64 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
     : 0;
 
   return (
-    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div>
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
+        <DialogContent sx={{ backgroundColor: 'rgb(12,51,84)', color: 'white', p: 3, position: 'relative' }}>
+          <IconButton
+            size="small"
+            onClick={() => setOpen(false)}
+            sx={{ position: 'absolute', top: 8, right: 8, color: 'white', backgroundColor: 'rgba(255,255,255,0.15)' }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+
+          <img src={displayImage} alt={name} style={{ width: '100%', borderRadius: '8px', marginBottom: '16px', display: 'block' }} />
+
+          <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: 'white' }}>{name}</Typography>
+
+          <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255,255,255,0.8)' }}>
+            {description}
+          </Typography>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+            {is_on_sale ? (
+              <>
+                <Typography variant="body1" sx={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.5)' }}>
+                  ${price}
+                </Typography>
+                <Typography variant="h5" sx={{ color: '#ff6b6b', fontWeight: 'bold' }}>${sale_price}</Typography>
+                <Typography variant="body2" sx={{ color: '#ff6b6b' }}>{discountPercent}% off</Typography>
+              </>
+            ) : (
+              <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold' }}>${price}</Typography>
+            )}
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <Button size="small" variant="outlined" sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} onClick={() => setSelectedQty(q => Math.max(1, q - 1))} disabled={outOfStock || selectedQty <= 1}>−</Button>
+            <Typography sx={{ color: 'white', minWidth: '24px', textAlign: 'center' }}>{selectedQty}</Typography>
+            <Button size="small" variant="outlined" sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} onClick={() => setSelectedQty(q => q + 1)} disabled={outOfStock || selectedQty >= stockQuantity}>+</Button>
+          </Box>
+
+          <Typography variant="body2" fontWeight="bold" sx={{ color: outOfStock ? '#ff6b6b' : '#4caf50', mb: 2 }}>
+            {outOfStock ? 'Out of Stock' : 'In-Stock'}
+          </Typography>
+
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <IconButton onClick={addToWishlist} sx={{ color: 'white', backgroundColor: 'rgba(255,255,255,0.15)' }}>
+              <FavoriteBorderIcon />
+            </IconButton>
+            <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock} fullWidth>
+              Add to Cart
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+
+    <Card
+      sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column', position: 'relative', cursor: 'pointer' }}
+      onClick={() => setOpen(true)}
+    >
       {is_on_sale && (
         <Chip
           label={`${discountPercent}% OFF`}
@@ -134,30 +189,32 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
           <Button
             size="small"
             variant="outlined"
-            onClick={() => setSelectedQty(selectedQty - 1)}
+            onClick={(e) => { e.stopPropagation(); setSelectedQty(q => Math.max(1, q - 1)); }}
             disabled={outOfStock || selectedQty <= 1}
           >−</Button>
           <Typography variant="body1">{selectedQty}</Typography>
           <Button
             size="small"
             variant="outlined"
-            onClick={() => setSelectedQty(selectedQty + 1)}
+            onClick={(e) => { e.stopPropagation(); setSelectedQty(q => q + 1); }}
             disabled={outOfStock || selectedQty >= stockQuantity}
           >+</Button>
         </div>
       </CardContent>
 
       <CardActions>
-        <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock}>
+        <Button variant="contained" color="primary" onClick={(e) => { e.stopPropagation(); addToCart(); }} disabled={outOfStock}>
           Add to Cart
         </Button>
 
-        <IconButton color="secondary" onClick={addToWishlist}>
+        <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); addToWishlist(); }}>
           <FavoriteBorderIcon />
         </IconButton>
       </CardActions>
     </Card>
+    </div>
   );
+
 }
 
 export default ShopItem;
