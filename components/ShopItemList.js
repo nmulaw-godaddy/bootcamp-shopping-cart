@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, CircularProgress } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
+import LoadingDoughnut from './LoadingDoughnut';
 import { useRouter } from 'next/router';
 import ShopItem from './ShopItem';
 
@@ -94,7 +95,7 @@ function ShopItemList() {
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <LoadingDoughnut />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (products.length === 0) return <Typography>No products available.</Typography>;
 
