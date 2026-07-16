@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from '../components/head';
-import Link from 'next/link';
 import ShopItemList from '../components/ShopItemList';
 import ShoppingChatbot from '../components/ShoppingChatbot';
+import LoginDoughnut from '../components/LoginDoughnut';
 import { Container } from '@mui/material';
 
-export const ShopPage = () => (
-  <Container sx={{ pt: 2 }}>
-    <Head title="Shop" />
-    <ShopItemList />
+export default function ShopPage() {
+  const [showDoughnut, setShowDoughnut] = useState(false);
 
-    <ShoppingChatbot />
-  </Container>
-);
+  useEffect(() => {
+    if (sessionStorage.getItem('justLoggedIn')) {
+      sessionStorage.removeItem('justLoggedIn');
+      setShowDoughnut(true);
+      const timer = setTimeout(() => setShowDoughnut(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
-export default ShopPage;
+  return (
+    <Container sx={{ pt: 2 }}>
+      {showDoughnut && <LoginDoughnut />}
+      <Head title="Shop" />
+      <ShopItemList />
+      <ShoppingChatbot />
+    </Container>
+  );
+}
