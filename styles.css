@@ -1,8 +1,100 @@
+:root {
+  --color-primary: #FF5C93;
+  --color-primary-dark: #E9427C;
+  --color-primary-light: #FFC6D9;
+  --color-background: #FFEDF5;
+  --color-surface: #FFFFFF;
+  --color-text: #432818;
+  --color-text-muted: #7A6A61;
+  --color-border: #F5CEDC;
+  --color-yellow: #FFD166;
+  --color-blue: #7ED6FF;
+  --color-purple: #C792EA;
+  --color-green: #A8E6CF;
+  --color-coral: #FF8AAE;
+  --shadow-card: 0 8px 24px rgba(255, 92, 147, 0.08);
+  --shadow-soft: 0 12px 30px rgba(255, 92, 147, 0.12);
+  --radius-card: 20px;
+  --radius-input: 12px;
+  --radius-button: 12px;
+  --radius-pill: 999px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: rgb(12,51,84);
-  color: white;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Poppins', 'Nunito', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
 }
 
 a:visited {
-  color: lightgray;
+  color: var(--color-primary-dark);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-light);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Focus visible outline */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Page transition fade */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }

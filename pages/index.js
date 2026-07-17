@@ -1,12 +1,12 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from '../components/head';
 
-export const IndexPage = (props) => (
-  <div>
-    <Head title='Home'/>
-    <h1>Welcome 2026!</h1>
-  </div>
-);
-
-export default IndexPage
+export default function IndexPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/shop');
+  }, []);
+  return <Head title="Doughmains" />;
+}
