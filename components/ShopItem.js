@@ -24,6 +24,7 @@ export function isOutOfStock(quantity) {
 }
 
 function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart, onAddToWishlist }) {
+
   const displayImage = getImageUrl(id, image_url);
   const outOfStock = isOutOfStock(stockQuantity);
   const [selectedQty, setSelectedQty] = useState(1);
@@ -253,6 +254,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       </CardActions>
     </Card>
   );
+
 }
 
 export default ShopItem;

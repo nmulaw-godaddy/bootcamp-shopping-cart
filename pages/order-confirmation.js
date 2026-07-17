@@ -34,6 +34,7 @@ function OrderConfirmation() {
     fetchOrder();
   }, [orderId]);
 
+
   if (loading) {
     return (
       <Container sx={{ pt: 10, textAlign: 'center' }}>

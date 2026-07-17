@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, CircularProgress, Box } from '@mui/material';
+import { Grid, Typography, CircularProgress, Box, Snackbar, Alert } from '@mui/material';
 import { useRouter } from 'next/router';
 import ShopItem from './ShopItem';
 
@@ -10,6 +10,10 @@ function ShopItemList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistToastOpen, setWishlistToastOpen] = useState(false);
+  const [wishlistToastItem, setWishlistToastItem] = useState('');
+  const [cartToastOpen, setCartToastOpen] = useState(false);
+  const [cartToastItem, setCartToastItem] = useState('');
   const router = useRouter();
   const searchTerm = (router.query.q || '').toLowerCase();
 
@@ -52,9 +56,11 @@ function ShopItemList() {
         });
         if (!postResponse.ok) return;
       }
-      router.push('/cart');
-    } catch {
-      // silently ignore
+
+      setCartToastItem(product.name);
+      setCartToastOpen(true);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
   };
 
@@ -65,10 +71,16 @@ function ShopItemList() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product),
       });
-      if (!response.ok) return;
-      router.push('/wishlist');
-    } catch {
-      // silently ignore
+
+      if (!response.ok) {
+        console.error('Add to wishlist failed:', await response.text());
+        return;
+      }
+
+      setWishlistToastItem(product.name);
+      setWishlistToastOpen(true);
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
     }
   };
 
@@ -108,24 +120,49 @@ function ShopItemList() {
   }
 
   return (
-    <Grid container spacing={3}>
-      {filtered.map((product) => (
-        <Grid item xs={12} sm={6} md={4} key={product.id}>
-          <ShopItem
-            id={product.id}
-            name={product.name}
-            description={product.description}
-            image_url={product.image_url}
-            price={product.price}
-            is_on_sale={product.is_on_sale}
-            sale_price={product.sale_price}
-            stockQuantity={product.quantity}
-            onAddToCart={handleAddToCart}
-            onAddToWishlist={handleAddToWishlist}
-          />
-        </Grid>
-      ))}
-    </Grid>
+    <>
+      <Snackbar
+        open={wishlistToastOpen}
+        autoHideDuration={3000}
+        onClose={() => setWishlistToastOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setWishlistToastOpen(false)} severity="success" variant="filled">
+          ❤️ <strong>{wishlistToastItem}</strong> added to your wishlist!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={cartToastOpen}
+        autoHideDuration={3000}
+        onClose={() => setCartToastOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setCartToastOpen(false)} severity="info" variant="filled">
+          🛒 <strong>{cartToastItem}</strong> added to your cart!
+        </Alert>
+      </Snackbar>
+
+      <Grid container spacing={3}>
+        {filtered.map((product) => (
+          <Grid item xs={12} sm={6} md={4} key={product.id}>
+            <ShopItem
+              id={product.id}
+              name={product.name}
+              description={product.description}
+              long_description={product.long_description}
+              image_url={product.image_url}
+              price={product.price}
+              is_on_sale={product.is_on_sale}
+              sale_price={product.sale_price}
+              stockQuantity={product.quantity}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    </>
   );
 }
 

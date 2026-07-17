@@ -51,6 +51,7 @@ export default function LoginPage() {
       setError(result.error);
       return;
     }
+    sessionStorage.setItem('justLoggedIn', 'true');
     router.push('/shop');
   };
 
