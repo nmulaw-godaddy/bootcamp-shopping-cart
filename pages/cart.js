@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Container,
-  Typography,
-  Alert,
-  Button,
-  Stack,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Tooltip,
-  IconButton,
+  Container, Typography, Button, Box,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  TextField, Tooltip, IconButton, Alert,
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import IosShareIcon from '@mui/icons-material/IosShare';
+import Head from '../components/head';
 import CartItemList from '../components/CartItemList';
 import { createCartShareUrl, decodeSharedCart } from '../components/CartShare';
 
@@ -35,7 +27,6 @@ function Cart() {
       alert('Your cart is empty. Add items before sharing.');
       return;
     }
-
     const cartItems = sharedCart || currentCartItems;
     const link = createCartShareUrl(cartItems, window.location.origin);
     setShareLink(link);
@@ -47,53 +38,68 @@ function Cart() {
       navigator.clipboard.writeText(shareLink).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      }).catch((err) => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy link. Please try again.');
+      }).catch(() => {
+        fallbackCopy();
       });
     } else {
-      const el = document.createElement('textarea');
-      el.value = shareLink;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      fallbackCopy();
     }
   };
 
-  const handleCloseDialog = () => {
-    setShareDialogOpen(false);
+  const fallbackCopy = () => {
+    const el = document.createElement('textarea');
+    el.value = shareLink;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <Container>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-        <Typography variant="h3">My Cart</Typography>
+    <Container maxWidth="lg" sx={{ pt: { xs: 3, md: 4 }, pb: 6 }}>
+      <Head title="My Cart" />
+
+      {/* Page header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: '#432818', fontSize: { xs: '1.6rem', md: '2rem' } }}>
+            My Cart
+          </Typography>
+        </Box>
         <Button
-          variant="contained"
-          color="primary"
+          variant="outlined"
+          startIcon={<IosShareIcon />}
           onClick={handleShareClick}
           disabled={currentCartItems.length === 0}
+          sx={{ borderRadius: 999, borderColor: '#F5CEDC', color: '#FF5C93', fontWeight: 600, px: 2.5 }}
         >
           Share Cart
         </Button>
-      </Stack>
+      </Box>
 
       {sharedCart && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          ✓ You are viewing a shared cart snapshot. Items cannot be modified.
+        <Alert severity="info" sx={{ mb: 3, borderRadius: 12 }}>
+          You are viewing a shared cart snapshot. Items cannot be modified.
         </Alert>
       )}
 
       <CartItemList sharedCart={sharedCart} onCartItemsChange={setCurrentCartItems} />
 
-      <Dialog open={shareDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>Share Your Cart</DialogTitle>
+      {/* Share cart dialog */}
+      <Dialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700, color: '#432818' }}>
+          Share Your Cart
+        </DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="body2" color="textSecondary">
+          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {copied && (
+              <Alert severity="success" sx={{ borderRadius: 12, py: 0.5 }}>
+                Link copied to clipboard!
+              </Alert>
+            )}
+            <Typography variant="body2" sx={{ color: '#7A6A61' }}>
               Share this link with others to show them your cart:
             </Typography>
             <TextField
@@ -103,8 +109,8 @@ function Cart() {
                 readOnly: true,
                 endAdornment: (
                   <Tooltip title={copied ? 'Copied!' : 'Copy link'}>
-                    <IconButton onClick={handleCopyLink} size="small" edge="end">
-                      <ContentCopyIcon />
+                    <IconButton onClick={handleCopyLink} size="small" edge="end" aria-label="copy share link">
+                      <ContentCopyIcon sx={{ fontSize: 18, color: copied ? '#2D6A4F' : '#FF5C93' }} />
                     </IconButton>
                   </Tooltip>
                 ),
@@ -114,9 +120,13 @@ function Cart() {
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-          <Button onClick={handleCopyLink} variant="contained" color="primary">
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button onClick={() => setShareDialogOpen(false)} sx={{ color: '#7A6A61' }}>Close</Button>
+          <Button
+            onClick={handleCopyLink}
+            variant="contained"
+            sx={{ borderRadius: 999, px: 3 }}
+          >
             {copied ? 'Copied!' : 'Copy Link'}
           </Button>
         </DialogActions>
@@ -126,6 +136,3 @@ function Cart() {
 }
 
 export default Cart;
-              
-              
-            

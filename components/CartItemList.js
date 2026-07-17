@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Typography, TextField, Button, Box, Alert, Chip } from '@mui/material';
 import Link from 'next/link';
 import CartItem from './CartItem';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 
 function CartItemList({ sharedCart, onCartItemsChange }) {
   const [cartItems, setCartItems] = useState([]);
@@ -20,13 +23,11 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
       try {
         const response = await fetch('http://localhost:8000/v1/cartitems');
         const json = await response.json();
-        console.log('Cart items from API:', json);
-        setCartItems(Array.isArray(json) ? json : []);
-        if (onCartItemsChange) {
-          onCartItemsChange(json);
-        }
-      } catch (error) {
-        console.error('Error fetching cart items:', error);
+        const items = Array.isArray(json) ? json : [];
+        setCartItems(items);
+        if (onCartItemsChange) onCartItemsChange(items);
+      } catch {
+        // silently ignore
       }
     };
 
@@ -35,8 +36,8 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
         const response = await fetch('http://localhost:8000/v1/promocodes');
         const json = await response.json();
         setAvailableCodes(Array.isArray(json) ? json : []);
-      } catch (error) {
-        console.error('Error fetching promo codes:', error);
+      } catch {
+        // silently ignore
       }
     };
 
@@ -52,33 +53,32 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
         body: JSON.stringify({ quantity: newQuantity }),
       });
       if (response.ok) {
-        setCartItems(cartItems.map((item) =>
+        const updated = cartItems.map((item) =>
           item.id === id ? { ...item, quantity: newQuantity } : item
-        ));
+        );
+        setCartItems(updated);
+        if (onCartItemsChange) onCartItemsChange(updated);
       } else {
         const json = await response.json();
         alert(json.message || 'Failed to update quantity.');
       }
-    } catch (error) {
-      console.error('Error updating quantity:', error);
+    } catch {
+      // silently ignore
     }
   };
 
   const deleteCartItem = async (id) => {
     try {
-      console.log('Deleting cart item id:', id);
-      const response = await fetch(`http://localhost:8000/v1/cartitems/${id}`, {
-        method: 'DELETE',
-      });
-      console.log('Delete response status:', response.status);
+      const response = await fetch(`http://localhost:8000/v1/cartitems/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        const newItems = cartItems.filter((item) => item.id !== id);
-        setCartItems(newItems);
+        const updated = cartItems.filter((item) => item.id !== id);
+        setCartItems(updated);
+        if (onCartItemsChange) onCartItemsChange(updated);
       } else {
         alert(`Failed to delete item ${id}. Status: ${response.status}`);
       }
-    } catch (error) {
-      console.error('Error deleting item:', error);
+    } catch {
+      // silently ignore
     }
   };
 
@@ -87,15 +87,10 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
       setPromoError('Please enter a promo code');
       return;
     }
-
     try {
-      const subtotal = (Array.isArray(cartItems) ? cartItems : [])
-        .map((item) => {
-          const itemPrice = Number(item.is_on_sale ? item.sale_price : item.price);
-          const quantity = Number(item.quantity || 1);
-          return quantity * itemPrice;
-        })
-        .reduce((a, b) => a + b, 0);
+      const subtotal = cartItems.reduce((a, item) => {
+        return a + (Number(item.is_on_sale ? item.sale_price : item.price) * Number(item.quantity || 1));
+      }, 0);
 
       const response = await fetch('http://localhost:8000/v1/promocodes/apply', {
         method: 'POST',
@@ -112,8 +107,7 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
         setPromoError(error.error || 'Invalid promo code');
         setAppliedPromo(null);
       }
-    } catch (error) {
-      console.error('Error applying promo code:', error);
+    } catch {
       setPromoError('Failed to apply promo code');
       setAppliedPromo(null);
     }
@@ -125,22 +119,37 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
     setPromoError('');
   };
 
-  const subtotal = (Array.isArray(cartItems) ? cartItems : [])
-    .map((item) => {
-      const itemPrice = Number(item.is_on_sale ? item.sale_price : item.price);
-      const quantity = Number(item.quantity || 1);
-      return quantity * itemPrice;
-    })
-    .reduce((a, b) => a + b, 0);
+  const subtotal = cartItems.reduce((a, item) => {
+    return a + (Number(item.is_on_sale ? item.sale_price : item.price) * Number(item.quantity || 1));
+  }, 0);
 
+  const discountAmount = appliedPromo ? appliedPromo.discount_amount : 0;
   const totalPrice = appliedPromo ? appliedPromo.final_total : subtotal;
 
+  if (cartItems.length === 0 && !sharedCart) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 8 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#432818', mb: 1 }}>Your cart is empty</Typography>
+        <Typography variant="body2" sx={{ color: '#7A6A61', mb: 3 }}>
+          Add some delicious products to get started!
+        </Typography>
+        <Link href="/shop" passHref>
+          <Button variant="contained" size="large" sx={{ borderRadius: 999 }}>
+            Browse Products
+          </Button>
+        </Link>
+      </Box>
+    );
+  }
+
   return (
-    <div>
-      <Grid container direction="column" spacing={3}>
-        {(Array.isArray(cartItems) ? cartItems : []).map((item) => (
-          <Grid item xs={6} key={item.id}>
+    <Grid container spacing={4}>
+      {/* Left: cart items */}
+      <Grid item xs={12} md={7}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {cartItems.map((item) => (
             <CartItem
+              key={item.id}
               product_id={item.product_id}
               name={item.name}
               description={item.description}
@@ -152,125 +161,160 @@ function CartItemList({ sharedCart, onCartItemsChange }) {
               onQuantityChange={(newQty) => updateCartItemQuantity(item.id, newQty)}
               onDeleteItem={() => deleteCartItem(item.id)}
             />
-          </Grid>
-        ))}
-      </Grid>
+          ))}
 
-      <Box sx={{ paddingTop: '30px', maxWidth: '500px' }}>
-        <Typography variant="h5" gutterBottom>
-          Promo Code
-        </Typography>
-
-        {appliedPromo ? (
-          <Box sx={{ marginBottom: 2 }}>
-            <Alert severity="success" onClose={removePromoCode} sx={{ marginBottom: 2 }}>
-              <strong>{appliedPromo.promo_code.code}</strong> applied!
-              {appliedPromo.promo_code.description && ` - ${appliedPromo.promo_code.description}`}
-            </Alert>
-          </Box>
-        ) : (
-          <>
-            <Box sx={{ display: 'flex', gap: 1, marginBottom: 2 }}>
-              <TextField
-                label="Enter promo code"
-                variant="outlined"
-                size="small"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                error={!!promoError}
-                helperText={promoError}
-                sx={{
-                  flex: 1,
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'white' },
-                    '&:hover fieldset': { borderColor: 'white' },
-                    '&.Mui-focused fieldset': { borderColor: 'white' },
-                  },
-                  '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputBase-input': { color: 'white' },
-                }}
-              />
+          {/* Continue shopping link */}
+          <Box sx={{ mt: 1 }}>
+            <Link href="/shop" passHref>
               <Button
-                variant="contained"
-                onClick={applyPromoCode}
-                disabled={!promoCode.trim()}
-                sx={{
-                  '&.Mui-disabled': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    color: 'rgba(255, 255, 255, 0.5)',
-                  }
-                }}
+                variant="outlined"
+                sx={{ borderRadius: 999, color: '#FF5C93', borderColor: '#F5CEDC' }}
               >
-                Apply
+                ← Continue Shopping
               </Button>
-            </Box>
-            {availableCodes.length > 0 && (
-              <Box sx={{ marginBottom: 2 }}>
-                <Typography variant="caption" color="text.secondary" gutterBottom>
-                  Available codes:
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', marginTop: 0.5 }}>
-                  {availableCodes.map((code) => (
-                    <Chip
-                      key={code.id}
-                      label={`${code.code} (${code.discount_percent}% off)`}
-                      size="small"
-                      onClick={() => setPromoCode(code.code)}
-                      sx={{
-                        cursor: 'pointer',
-                        backgroundColor: 'primary.main',
-                        color: 'white',
-                        '&:hover': { backgroundColor: 'primary.dark' }
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            )}
-          </>
-        )}
-
-        <Box sx={{ paddingTop: '20px', borderTop: '2px solid #ddd' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 1 }}>
-            <Typography variant="h6">Subtotal:</Typography>
-            <Typography variant="h6">${subtotal.toFixed(2)}</Typography>
-          </Box>
-
-          {appliedPromo && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 1, color: 'green' }}>
-              <Typography>Discount ({appliedPromo.promo_code.discount_percent}%):</Typography>
-              <Typography>-${appliedPromo.discount_amount.toFixed(2)}</Typography>
-            </Box>
-          )}
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, paddingTop: 2, borderTop: '1px solid #ddd' }}>
-            <Typography variant="h4">Total:</Typography>
-            <Typography variant="h4" color={appliedPromo ? 'primary' : 'text.primary'}>
-              ${totalPrice.toFixed(2)}
-            </Typography>
+            </Link>
           </Box>
         </Box>
-      </Box>
+      </Grid>
 
-      <Box sx={{ paddingTop: '20px' }}>
-        <Link href="/checkout" passHref>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            disabled={cartItems.length === 0}
-            style={{ marginRight: '12px' }}
-          >
-            Proceed to Checkout
-          </Button>
-        </Link>
-        <Link href="/shop" passHref>
-          <Button variant="outlined" size="large">
-            Continue Shopping
-          </Button>
-        </Link>
-      </Box>
-    </div>
+      {/* Right: order summary */}
+      <Grid item xs={12} md={5}>
+        <Box
+          sx={{
+            backgroundColor: '#FFFFFF',
+            border: '1.5px solid #F5CEDC',
+            borderRadius: '20px',
+            p: 3,
+            boxShadow: '0 8px 24px rgba(255,92,147,0.08)',
+            position: { md: 'sticky' },
+            top: { md: 80 },
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: '#432818', mb: 2.5 }}>
+            Order Summary
+          </Typography>
+
+          {/* Promo code */}
+          <Box sx={{ mb: 2.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5 }}>
+              <LocalOfferIcon sx={{ fontSize: 16, color: '#FF5C93' }} />
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#432818' }}>Promo Code</Typography>
+            </Box>
+
+            {appliedPromo ? (
+              <Alert
+                severity="success"
+                onClose={removePromoCode}
+                sx={{ borderRadius: 12, py: 0.75, fontSize: '0.8rem' }}
+              >
+                <strong>{appliedPromo.promo_code.code}</strong> applied!
+                {appliedPromo.promo_code.description && ` — ${appliedPromo.promo_code.description}`}
+              </Alert>
+            ) : (
+              <>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TextField
+                    placeholder="Enter promo code"
+                    variant="outlined"
+                    size="small"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    error={!!promoError}
+                    helperText={promoError}
+                    sx={{ flex: 1 }}
+                    inputProps={{ 'aria-label': 'promo code input' }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={applyPromoCode}
+                    disabled={!promoCode.trim()}
+                    sx={{ borderRadius: 12, px: 2, flexShrink: 0, fontWeight: 700 }}
+                  >
+                    Apply
+                  </Button>
+                </Box>
+
+                {availableCodes.length > 0 && (
+                  <Box sx={{ mt: 1.5, display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                    {availableCodes.map((code) => (
+                      <Chip
+                        key={code.id}
+                        label={`${code.code} (${code.discount_percent}% off)`}
+                        size="small"
+                        onClick={() => setPromoCode(code.code)}
+                        sx={{
+                          cursor: 'pointer',
+                          backgroundColor: '#FFF0F6',
+                          color: '#FF5C93',
+                          border: '1px solid #F5CEDC',
+                          fontWeight: 600,
+                          fontSize: '0.72rem',
+                          height: 22,
+                          borderRadius: 999,
+                          '&:hover': { backgroundColor: '#FFC6D9' },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+              </>
+            )}
+          </Box>
+
+          {/* Totals */}
+          <Box sx={{ borderTop: '1.5px solid #F5CEDC', pt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant="body2" sx={{ color: '#7A6A61' }}>Subtotal</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#432818' }}>${subtotal.toFixed(2)}</Typography>
+            </Box>
+
+            {appliedPromo && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="body2" sx={{ color: '#2D6A4F' }}>
+                  Discount ({appliedPromo.promo_code.discount_percent}%)
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#2D6A4F' }}>
+                  −${discountAmount.toFixed(2)}
+                </Typography>
+              </Box>
+            )}
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1.5, borderTop: '1.5px solid #F5CEDC', mt: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#432818' }}>Total</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#FF5C93' }}>
+                ${totalPrice.toFixed(2)}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Checkout button */}
+          <Box sx={{ mt: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Link href="/checkout" passHref>
+              <Button
+                variant="contained"
+                fullWidth
+                size="large"
+                disabled={cartItems.length === 0}
+                endIcon={<ArrowForwardIcon />}
+                sx={{ borderRadius: 12, py: 1.4, fontWeight: 700, fontSize: '0.95rem' }}
+              >
+                Proceed to Checkout
+              </Button>
+            </Link>
+            <Link href="/shop" passHref>
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={<ShoppingBagIcon />}
+                sx={{ borderRadius: 12, py: 1.1, borderColor: '#F5CEDC', color: '#FF5C93', fontWeight: 600 }}
+              >
+                Continue Shopping
+              </Button>
+            </Link>
+          </Box>
+        </Box>
+      </Grid>
+    </Grid>
   );
 }
 

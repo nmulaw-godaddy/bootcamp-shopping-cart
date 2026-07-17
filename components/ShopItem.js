@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Chip, Box } from '@mui/material';
+import {
+  Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, Chip, Box,
+} from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const images = [
   "https://img1.wsimg.com/cdn/Image/All/AllChannelsFoS/1/en-US/c8d98599-46cc-412d-bbb5-d766bb0e5a05/Product-grid-SSL.jpg",
@@ -21,7 +24,6 @@ export function isOutOfStock(quantity) {
 }
 
 function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_price, stockQuantity, onAddToCart, onAddToWishlist }) {
-
   const displayImage = getImageUrl(id, image_url);
   const outOfStock = isOutOfStock(stockQuantity);
   const [selectedQty, setSelectedQty] = useState(1);
@@ -29,7 +31,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
   const displayPrice = Number(is_on_sale ? sale_price : price);
 
   const addToCart = () => {
-    const newItem = {
+    onAddToCart({
       product_id: id,
       name,
       description,
@@ -38,13 +40,11 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       is_on_sale,
       sale_price,
       quantity: selectedQty,
-    };
-
-    onAddToCart(newItem);
+    });
   };
 
   const addToWishlist = () => {
-    const newItem = {
+    onAddToWishlist({
       product_id: id,
       name,
       description,
@@ -52,9 +52,7 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
       price: displayPrice,
       is_on_sale,
       sale_price,
-    };
-
-    onAddToWishlist(newItem);
+    });
   };
 
   const discountPercent = is_on_sale && price && sale_price
@@ -62,99 +60,196 @@ function ShopItem({ id, name, description, image_url, price, is_on_sale, sale_pr
     : 0;
 
   return (
-    <Card sx={{ opacity: outOfStock ? 0.5 : 1, height: '460px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <Card
+      sx={{
+        opacity: outOfStock ? 0.65 : 1,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        borderRadius: '20px',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+        ...(!outOfStock && {
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 16px 40px rgba(255, 92, 147, 0.18)',
+          },
+        }),
+      }}
+    >
+      {/* Sale badge */}
       {is_on_sale && (
         <Chip
           label={`${discountPercent}% OFF`}
-          color="error"
           size="small"
           sx={{
             position: 'absolute',
-            top: 10,
-            right: 10,
+            top: 12,
+            right: 12,
             zIndex: 1,
-            fontWeight: 'bold'
+            fontWeight: 700,
+            fontSize: '0.7rem',
+            backgroundColor: '#FF5C93',
+            color: '#ffffff',
+            height: 22,
+            borderRadius: 999,
+            boxShadow: '0 2px 8px rgba(255,92,147,0.4)',
           }}
         />
       )}
+
+      {/* Wishlist heart */}
+      <IconButton
+        aria-label={`add ${name} to wishlist`}
+        onClick={addToWishlist}
+        size="small"
+        sx={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          zIndex: 1,
+          backgroundColor: 'rgba(255,255,255,0.92)',
+          border: '1px solid #F5CEDC',
+          width: 32,
+          height: 32,
+          '&:hover': { backgroundColor: '#FFF0F6', '& svg': { color: '#FF5C93' } },
+        }}
+      >
+        <FavoriteBorderIcon sx={{ fontSize: 16, color: '#FF8AAE' }} />
+      </IconButton>
+
+      {/* Product image */}
       {displayImage && (
-        <CardMedia
-          component="img"
-          height="200"
-          image={displayImage}
-          alt={name}
-        />
+        <Box sx={{ overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
+          <CardMedia
+            component="img"
+            height="180"
+            image={displayImage}
+            alt={name}
+            sx={{
+              objectFit: 'cover',
+              transition: 'transform 0.3s ease',
+              ...(!outOfStock && { '&:hover': { transform: 'scale(1.04)' } }),
+            }}
+          />
+        </Box>
       )}
 
-      <CardContent sx={{ flex: 1, overflow: 'hidden' }}>
-        <Typography variant="h5" component="div">
+      <CardContent sx={{ flex: 1, p: 2, pb: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '0.95rem', mb: 0.5, color: '#432818', lineHeight: 1.3 }}>
           {name}
         </Typography>
 
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+          sx={{
+            color: '#7A6A61',
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            lineHeight: 1.5,
+            mb: 1,
+            fontSize: '0.8rem',
+          }}
         >
           {description}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Price */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
           {is_on_sale ? (
             <>
-              <Typography
-                variant="body2"
-                sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
-              >
-                ${price}
+              <Typography variant="body2" sx={{ textDecoration: 'line-through', color: '#7A6A61', fontSize: '0.8rem' }}>
+                ${Number(price).toFixed(2)}
               </Typography>
-              <Typography variant="h6" color="error" sx={{ fontWeight: 'bold' }}>
-                ${sale_price}
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#FF5C93', fontSize: '1rem' }}>
+                ${Number(sale_price).toFixed(2)}
               </Typography>
             </>
           ) : (
-            <Typography variant="h6" color="text.primary">
-              ${price}
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#432818', fontSize: '1rem' }}>
+              ${Number(price).toFixed(2)}
             </Typography>
           )}
         </Box>
 
         {outOfStock && (
-          <Typography variant="body2" color="error">
+          <Typography variant="caption" sx={{ color: '#FF5C93', fontWeight: 600, display: 'block' }}>
             Out of Stock
           </Typography>
         )}
         {!outOfStock && stockQuantity < 5 && (
-          <Typography variant="body2" color="error">
+          <Typography variant="caption" sx={{ color: '#FF8AAE', fontWeight: 600, display: 'block' }}>
             Only {stockQuantity} remaining!
           </Typography>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => setSelectedQty(selectedQty - 1)}
-            disabled={outOfStock || selectedQty <= 1}
-          >−</Button>
-          <Typography variant="body1">{selectedQty}</Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => setSelectedQty(selectedQty + 1)}
-            disabled={outOfStock || selectedQty >= stockQuantity}
-          >+</Button>
-        </div>
+        {/* Quantity stepper */}
+        {!outOfStock && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setSelectedQty(Math.max(1, selectedQty - 1))}
+              disabled={selectedQty <= 1}
+              sx={{
+                minWidth: 32,
+                width: 32,
+                height: 32,
+                p: 0,
+                borderRadius: 999,
+                borderColor: '#F5CEDC',
+                color: '#FF5C93',
+                fontSize: '1rem',
+                '&:hover': { borderColor: '#FF5C93', backgroundColor: 'rgba(255,92,147,0.04)' },
+              }}
+              aria-label="decrease quantity"
+            >
+              −
+            </Button>
+            <Typography variant="body2" sx={{ minWidth: 20, textAlign: 'center', fontWeight: 600, color: '#432818' }}>
+              {selectedQty}
+            </Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setSelectedQty(Math.min(stockQuantity, selectedQty + 1))}
+              disabled={selectedQty >= stockQuantity}
+              sx={{
+                minWidth: 32,
+                width: 32,
+                height: 32,
+                p: 0,
+                borderRadius: 999,
+                borderColor: '#F5CEDC',
+                color: '#FF5C93',
+                fontSize: '1rem',
+                '&:hover': { borderColor: '#FF5C93', backgroundColor: 'rgba(255,92,147,0.04)' },
+              }}
+              aria-label="increase quantity"
+            >
+              +
+            </Button>
+          </Box>
+        )}
+        {outOfStock && (
+          <Box sx={{ mt: 1, height: 32 }} />
+        )}
       </CardContent>
 
-      <CardActions>
-        <Button variant="contained" color="primary" onClick={addToCart} disabled={outOfStock}>
-          Add to Cart
+      <CardActions sx={{ p: 2, pt: 0 }}>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={addToCart}
+          disabled={outOfStock}
+          startIcon={<AddShoppingCartIcon sx={{ fontSize: '1rem !important' }} />}
+          sx={{ borderRadius: 12, py: 1.1, fontSize: '0.85rem', fontWeight: 700 }}
+          aria-label={`add ${name} to cart`}
+        >
+          {outOfStock ? 'Out of Stock' : 'Add to Cart'}
         </Button>
-
-        <IconButton color="secondary" onClick={addToWishlist}>
-          <FavoriteBorderIcon />
-        </IconButton>
       </CardActions>
     </Card>
   );
